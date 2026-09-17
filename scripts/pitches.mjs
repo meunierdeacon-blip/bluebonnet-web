@@ -10,7 +10,7 @@ import { slugify } from '../mockup/render.mjs';
 import { parseCsv } from '../mockup/csv.mjs';
 
 const priorityOf = (r) => Number((r.notes || '').match(/PRIORITY (\d)/)?.[1] || 9);
-const reviewCount = (r) => Number((r.notes || '').match(/\/ (\d+) review/)?.[1] || 0);
+const reviewCount = (r) => Number((r.notes || '').match(/stars \/ (\d+)/)?.[1] || 0);
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const live = SITE.url.replace(/^https?:\/\//, '');
 const leads = parseCsv(readFileSync(join(root, 'leads/leads.csv'), 'utf8')).filter((r) => r.status === 'mockup made')
