@@ -19,6 +19,7 @@ import { join, resolve, dirname, basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { PRESETS, THEMES } from './mockup/presets.mjs';
 import { renderMockup, slugify } from './mockup/render.mjs';
+import { parseCsv } from './mockup/csv.mjs';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const args = process.argv.slice(2);
@@ -33,29 +34,6 @@ const flag = (name) => {
   return i >= 0 && args[i + 1] && !args[i + 1].startsWith('--') ? args[i + 1] : undefined;
 };
 const splitList = (s) => s.split(/[,;]/).map((x) => x.trim()).filter(Boolean);
-
-// Minimal CSV parser: handles quoted fields, commas and newlines inside quotes, and "" escapes.
-function parseCsv(text) {
-  const rows = [[]];
-  let field = '', quoted = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (quoted) {
-      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
-      else if (c === '"') quoted = false;
-      else field += c;
-    } else if (c === '"') quoted = true;
-    else if (c === ',') { rows.at(-1).push(field); field = ''; }
-    else if (c === '\n' || c === '\r') {
-      if (c === '\r' && text[i + 1] === '\n') i++;
-      rows.at(-1).push(field); field = ''; rows.push([]);
-    } else field += c;
-  }
-  rows.at(-1).push(field);
-  const [header, ...body] = rows.filter((r) => r.some((f) => f.trim()));
-  const keys = header.map((h) => h.trim().toLowerCase());
-  return body.map((r) => Object.fromEntries(keys.map((k, i) => [k, (r[i] || '').trim()])));
-}
 
 let leads;
 const input = args.find((a) => /\.(json|csv)$/i.test(a));
