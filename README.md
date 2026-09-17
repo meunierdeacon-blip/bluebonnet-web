@@ -36,6 +36,7 @@ These are sensible defaults, not promises you’ve made yet.
 | Check for broken links and SEO problems | `node scripts/check.mjs` |
 | Preview locally | `node scripts/serve.mjs`, then open http://localhost:4322/bluebonnet-web/ |
 | Publish to the live site | `node scripts/deploy.mjs` |
+| Write text-message pitches for leads marked `mockup made` | `node scripts/pitches.mjs` → `PITCHES.md` |
 | List trades and color themes for mockups | `node mockup.mjs --list` |
 | Mockup for one business | `node mockup.mjs --name "Hill Country Lawn" --trade "lawn care" --town Lakeway --phone "(512) 555-0100" --shot` |
 | Mockup with custom services | copy `leads/example-lawn.json`, edit it, then `node mockup.mjs leads/your-file.json --shot` |
