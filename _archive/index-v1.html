@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bluebonnet Web | Websites for Austin Local Businesses</title>
+<meta name="description" content="Fast, Google-ready websites for Austin-area small businesses. Built in about a week, flat pricing, and optional monthly care so you never have to touch it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌼</text></svg>">
+<style>
+  /* ============ EDIT ME ============
+     Business name, email, and prices live in the CONFIG block near the bottom of this file
+     and in the text below. Search for "Bluebonnet Web" to rename. */
+  :root {
+    --bg: #faf7f0;
+    --surface: #ffffff;
+    --ink: #1b2a24;
+    --muted: #5a6660;
+    --line: #e4ded0;
+    --accent: #3b5bdb;
+    --accent-ink: #ffffff;
+    --accent-soft: #e8edff;
+    --good: #2f7d4f;
+    --warn: #b4581b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121815; --surface: #1a221e; --ink: #eef1ec; --muted: #a3ada7;
+      --line: #2c3631; --accent: #8ea6ff; --accent-ink: #0f1633; --accent-soft: #232c4a;
+      --good: #6fcf97; --warn: #f2a46b;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 400 17px/1.6 Inter, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: Fraunces, Georgia, serif; line-height: 1.15; margin: 0 0 .5em; letter-spacing: -.01em; }
+  h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); }
+  h2 { font-size: clamp(1.7rem, 4vw, 2.4rem); }
+  h3 { font-size: 1.25rem; }
+  p { margin: 0 0 1em; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  section { padding: 72px 0; border-top: 1px solid var(--line); }
+  .eyebrow { font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: .75rem; }
+  .lede { font-size: 1.15rem; color: var(--muted); max-width: 40em; }
+
+  header { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .logo { font-family: Fraunces, Georgia, serif; font-weight: 700; font-size: 1.2rem; color: var(--ink); text-decoration: none; }
+  nav a { color: var(--muted); text-decoration: none; margin-left: 20px; font-size: .95rem; }
+  nav a:hover { color: var(--ink); }
+  @media (max-width: 640px) { nav a:not(.btn) { display: none; } }
+
+  .btn { display: inline-block; background: var(--accent); color: var(--accent-ink); padding: 12px 20px; border-radius: 10px; font-weight: 600; text-decoration: none; border: 0; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  .btn:hover { filter: brightness(1.08); }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  nav .btn { padding: 8px 14px; font-size: .9rem; margin-left: 20px; color: var(--accent-ink); }
+
+  .hero { padding: 88px 0 72px; border-top: 0; }
+  .hero .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+  .proof { margin-top: 40px; display: flex; gap: 28px; flex-wrap: wrap; color: var(--muted); font-size: .95rem; }
+  .proof b { color: var(--ink); font-weight: 600; }
+
+  .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 32px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  .card p { color: var(--muted); margin: 0; }
+
+  .price { display: flex; flex-direction: column; }
+  .price .amt { font-family: Fraunces, Georgia, serif; font-size: 2.4rem; font-weight: 700; margin: 4px 0 2px; }
+  .price .amt small { font-size: 1rem; font-family: Inter, sans-serif; color: var(--muted); font-weight: 400; }
+  .price ul { padding-left: 1.1em; color: var(--muted); margin: 16px 0 24px; flex: 1; }
+  .price li { margin-bottom: 6px; }
+  .price.featured { border: 2px solid var(--accent); }
+  .tag { display: inline-block; align-self: flex-start; background: var(--accent-soft); color: var(--accent); font-size: .75rem; font-weight: 600; padding: 3px 10px; border-radius: 99px; margin-bottom: 8px; }
+
+  .case { display: grid; gap: 32px; grid-template-columns: 1.1fr 1fr; align-items: center; }
+  @media (max-width: 800px) { .case { grid-template-columns: 1fr; } }
+  .browser { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px -24px rgba(0,0,0,.25); }
+  .browser .bar { display: flex; gap: 6px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: .8rem; color: var(--muted); }
+  .browser .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+  .browser .url { margin-left: 10px; background: var(--bg); padding: 3px 10px; border-radius: 6px; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .browser .body { padding: 28px; background: linear-gradient(160deg, #0f3b4a, #16606e); color: #f2fbfa; min-height: 220px; }
+  .browser .body h3 { color: #fff; font-size: 1.5rem; }
+  .browser .body p { color: #cfe8e6; font-size: .95rem; }
+  .browser .body .fake-btn { display: inline-block; background: #f4c542; color: #1b2a24; padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: .9rem; }
+  .checks { list-style: none; padding: 0; margin: 20px 0; }
+  .checks li { padding-left: 28px; position: relative; margin-bottom: 10px; }
+  .checks li::before { content: "✓"; position: absolute; left: 0; color: var(--good); font-weight: 700; }
+
+  /* Website check tool */
+  .quiz { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px; margin-top: 32px; }
+  .q { display: flex; gap: 12px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .q:last-of-type { border-bottom: 0; }
+  .q input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--accent); flex-shrink: 0; }
+  .q span small { display: block; color: var(--muted); font-size: .88rem; }
+  .meter { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 20px 0 10px; }
+  .meter i { display: block; height: 100%; width: 0; background: var(--warn); transition: width .3s, background .3s; }
+  #verdict { font-weight: 600; min-height: 1.6em; }
+
+  .steps { counter-reset: s; }
+  .steps .card { position: relative; padding-top: 56px; }
+  .steps .card::before { counter-increment: s; content: counter(s); position: absolute; top: 20px; left: 24px; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; display: grid; place-items: center; font-size: .9rem; }
+
+  details { border-bottom: 1px solid var(--line); padding: 16px 0; }
+  summary { font-weight: 600; cursor: pointer; }
+  details p { color: var(--muted); margin: 10px 0 0; }
+
+  form { display: grid; gap: 14px; margin-top: 28px; max-width: 620px; }
+  label { font-weight: 500; font-size: .95rem; display: grid; gap: 6px; }
+  input[type=text], input[type=email], input[type=url], select, textarea {
+    font: inherit; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); width: 100%;
+  }
+  textarea { min-height: 110px; resize: vertical; }
+  .row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+  #formNote { color: var(--muted); font-size: .9rem; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0; color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#top">🌼 Bluebonnet Web</a>
+    <nav>
+      <a href="#work">Work</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#check">Free check</a>
+      <a class="btn" href="#contact">Get a quote</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Websites for Austin-area small businesses</div>
+      <h1>Your customers are searching Google.<br>Let's make sure they find you.</h1>
+      <p class="lede">We build fast, good-looking websites for local service businesses: landscapers, cleaners, lake and pool services, tutors, food trucks. You get a site that works on phones and is set up for Google, usually live within about a week, at a flat price.</p>
+      <div class="actions">
+        <a class="btn" href="#contact">Get a free quote</a>
+        <a class="btn ghost" href="#check">Check your current site</a>
+      </div>
+      <div class="proof">
+        <span><b>Flat pricing</b>, no surprise bills</span>
+        <span><b>Phone-first</b> design</span>
+        <span><b>Google-ready</b> from day one</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="work">
+    <div class="wrap case">
+      <div>
+        <div class="eyebrow">Recent work</div>
+        <h2>Waterline Weed Co.</h2>
+        <p class="lede">A lake-weed removal crew on the Highland Lakes needed people on Lake Travis and Lake Austin to find them. We built the whole thing from scratch.</p>
+        <ul class="checks">
+          <li>A multi-page site with a page for each lake and service, so each one can show up in search</li>
+          <li>Custom domain, HTTPS, and verified in Google Search Console with a submitted sitemap</li>
+          <li>Search-friendly titles, descriptions, and structured data on every page</li>
+          <li>Built so it loads fast on a phone at the dock, not just on a laptop</li>
+        </ul>
+        <a class="btn ghost" href="https://waterlineweeds.co" target="_blank" rel="noopener">See the live site ↗</a>
+      </div>
+      <div class="browser" aria-hidden="true">
+        <div class="bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="url">waterlineweeds.co</span></div>
+        <div class="body">
+          <h3>Clear water. Clean docks.</h3>
+          <p>Hand-pulled, chemical-free hydrilla removal on Lake Travis, Lake Austin, and Lake LBJ.</p>
+          <span class="fake-btn">Get a quote</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="wrap">
+      <div class="eyebrow">Pricing</div>
+      <h2>Simple, flat prices</h2>
+      <p class="lede">No hourly billing. You'll know the full price before we start, and you only pay the rest when you're happy with the site.</p>
+      <div class="grid">
+        <div class="card price">
+          <h3>Starter</h3>
+          <div class="amt">$400</div>
+          <p>For businesses with no website, or one that's embarrassing.</p>
+          <ul>
+            <li>One polished page: services, area, photos, contact</li>
+            <li>Works great on phones</li>
+            <li>Contact form or tap-to-call button</li>
+            <li>Basic Google setup</li>
+          </ul>
+          <a class="btn ghost" href="#contact" data-plan="Starter">Choose Starter</a>
+        </div>
+        <div class="card price featured">
+          <span class="tag">Most popular</span>
+          <h3>Local SEO Site</h3>
+          <div class="amt">$900</div>
+          <p>For businesses that want to show up when people search.</p>
+          <ul>
+            <li>Up to 6 pages (a page per service or area)</li>
+            <li>Quote form with photo upload</li>
+            <li>Search titles, descriptions, and sitemap</li>
+            <li>Google Search Console setup</li>
+            <li>Custom domain connected</li>
+          </ul>
+          <a class="btn" href="#contact" data-plan="Local SEO Site">Choose Local SEO</a>
+        </div>
+        <div class="card price">
+          <h3>Care Plan</h3>
+          <div class="amt">$35<small> /month</small></div>
+          <p>Add to any site so you never have to think about it.</p>
+          <ul>
+            <li>Hosting handled for you</li>
+            <li>Text or email changes, done within 2 business days</li>
+            <li>New photos, prices, or hours anytime</li>
+            <li>Cancel whenever</li>
+          </ul>
+          <a class="btn ghost" href="#contact" data-plan="Care Plan">Add Care Plan</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="check">
+    <div class="wrap">
+      <div class="eyebrow">Free 60-second check</div>
+      <h2>Is your website costing you customers?</h2>
+      <p class="lede">Pull up your site on your phone and tick what's true. No email needed.</p>
+      <div class="quiz" id="quiz">
+        <label class="q"><input type="checkbox"><span>It looks right on a phone without pinching or zooming<small>Most local searches happen on phones.</small></span></label>
+        <label class="q"><input type="checkbox"><span>A customer can call or request a quote in one tap<small>If it takes hunting, they'll call the next result.</small></span></label>
+        <label class="q"><input type="checkbox"><span>It loads in under about 3 seconds on cell data<small>Slow pages lose visitors before they ever see you.</small></span></label>
+        <label class="q"><input type="checkbox"><span>It clearly says what you do and which towns you serve<small>Google and customers both need this spelled out.</small></span></label>
+        <label class="q"><input type="checkbox"><span>It shows up when you Google your business name<small>If you can't find yourself, neither can customers.</small></span></label>
+        <label class="q"><input type="checkbox"><span>It has real photos of your work<small>Photos build trust faster than any sentence.</small></span></label>
+        <label class="q"><input type="checkbox"><span>Prices, hours, and phone number are up to date<small>Wrong info means lost calls and bad reviews.</small></span></label>
+        <label class="q"><input type="checkbox"><span>The address bar shows a lock (https)<small>Browsers warn people away from sites without it.</small></span></label>
+        <div class="meter"><i id="meterBar"></i></div>
+        <div id="verdict">Tick the boxes that are true to see your score.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow">How it works</div>
+      <h2>Live in about a week</h2>
+      <div class="grid steps">
+        <div class="card"><h3>Quick call</h3><p>15 minutes. You tell us what you do, where you work, and what customers ask about most.</p></div>
+        <div class="card"><h3>We build it</h3><p>You send photos and your logo if you have one. We write the first draft of the words for you.</p></div>
+        <div class="card"><h3>You review</h3><p>We send you a private link. Ask for changes until it feels right.</p></div>
+        <div class="card"><h3>Go live</h3><p>We connect your domain and set up Google. You pay the balance once it's live.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow">Questions</div>
+      <h2>Common questions</h2>
+      <details><summary>How do payments work?</summary><p>Half up front to start, half when the site is live and you're happy with it. Care Plans are billed monthly and you can cancel anytime.</p></details>
+      <details><summary>Do I need to already have a domain name?</summary><p>No. We can help you pick and register one (usually around $10–20 a year, paid directly by you so you always own it).</p></details>
+      <details><summary>What if I don't have photos or a logo?</summary><p>That's fine. We can start with a clean text logo, and phone photos of your work are usually better than stock photos anyway.</p></details>
+      <details><summary>Do I own the website?</summary><p>Yes. The domain is in your name, and if you ever leave we hand over all the files.</p></details>
+      <details><summary>Can you guarantee I'll be #1 on Google?</summary><p>Nobody honestly can. What we can do is set your site up the right way so Google understands what you do and where, which is what most local businesses are missing.</p></details>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <div class="eyebrow">Get a quote</div>
+      <h2>Tell us about your business</h2>
+      <p class="lede">We'll reply within a day with a flat price and a couple of ideas for your site.</p>
+      <form id="quoteForm">
+        <div class="row">
+          <label>Your name<input type="text" name="name" required autocomplete="name"></label>
+          <label>Business name<input type="text" name="business" required autocomplete="organization"></label>
+        </div>
+        <div class="row">
+          <label>Email<input type="email" name="email" required autocomplete="email"></label>
+          <label>Current website (if any)<input type="text" name="website" placeholder="none yet"></label>
+        </div>
+        <label>What are you interested in?
+          <select name="plan" id="planSelect">
+            <option>Not sure yet</option>
+            <option>Starter</option>
+            <option>Local SEO Site</option>
+            <option>Care Plan</option>
+          </select>
+        </label>
+        <label>What does your business do, and where?<textarea name="details" required></textarea></label>
+        <div><button class="btn" type="submit">Send</button></div>
+        <p id="formNote"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">© <span id="year"></span> Bluebonnet Web · Austin, Texas</div>
+</footer>
+
+<script>
+  // ============ CONFIG: fill this in before sharing the site ============
+  const CONFIG = {
+    // The inbox where quote requests go. Use a business email, not a school account.
+    email: '',
+  };
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Pricing buttons preselect the plan in the form
+  document.querySelectorAll('[data-plan]').forEach(a =>
+    a.addEventListener('click', () => { document.getElementById('planSelect').value = a.dataset.plan; })
+  );
+
+  // Website check
+  const boxes = [...document.querySelectorAll('#quiz input')];
+  const bar = document.getElementById('meterBar');
+  const verdict = document.getElementById('verdict');
+  boxes.forEach(b => b.addEventListener('change', () => {
+    const n = boxes.filter(x => x.checked).length;
+    bar.style.width = (n / boxes.length * 100) + '%';
+    bar.style.background = n >= 7 ? 'var(--good)' : 'var(--warn)';
+    verdict.innerHTML = n >= 7
+      ? `${n}/8. Your site is in good shape. A Care Plan can keep it that way.`
+      : n >= 4
+        ? `${n}/8. Customers are probably slipping through the cracks. <a href="#contact">Get a free quote</a> to fix the gaps.`
+        : `${n}/8. Your site is likely sending customers to competitors. <a href="#contact">Let's fix that</a>.`;
+  }));
+
+  // Quote form: opens the visitor's email app with everything filled in
+  document.getElementById('quoteForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const note = document.getElementById('formNote');
+    if (!CONFIG.email) { note.textContent = 'Setup needed: add your email to CONFIG at the bottom of index.html.'; return; }
+    const d = Object.fromEntries(new FormData(e.target));
+    const body = `Name: ${d.name}\nBusiness: ${d.business}\nEmail: ${d.email}\nWebsite: ${d.website || 'none'}\nInterested in: ${d.plan}\n\n${d.details}`;
+    location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Website quote: ' + d.business)}&body=${encodeURIComponent(body)}`;
+    note.textContent = 'Your email app should open with your message ready. Just hit send.';
+  });
+</script>
+</body>
+</html>

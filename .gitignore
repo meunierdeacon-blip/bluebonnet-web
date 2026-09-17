@@ -1,0 +1,9 @@
+dist/
+# Prospect and client info stays off GitHub
+mockups/
+clients/
+leads/*
+!leads/leads-template.csv
+!leads/example-lawn.json
+.DS_Store
+PITCHES.md

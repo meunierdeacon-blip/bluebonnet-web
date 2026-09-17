@@ -1,0 +1,12 @@
+{
+  "name": "Example Lawn Co",
+  "trade": "lawn care",
+  "town": "Lakeway",
+  "areas": ["Lakeway", "Bee Cave", "The Hills", "Spicewood"],
+  "phone": "(512) 555-0100",
+  "services": [
+    ["Mowing & edging", "Clean lines and a freshly cut lawn on a schedule that fits your yard."],
+    ["Hedge trimming", "Shaped, tidy hedges that don't take over the walkway."],
+    ["Leaf cleanup", "Seasonal cleanups so the lawn can breathe."]
+  ]
+}
