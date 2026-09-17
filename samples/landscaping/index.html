@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-base="/bluebonnet-web">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Sample Landscapes | Landscaping in Dripping Springs, TX</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌳</text></svg>">
+
+<style>
+  :root { --ink:#1d2b1f; --accent:#2f7d4f; --accent-ink:#ffffff; --bg:#f7f8f2; --soft:#e6eedc; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 400 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif; color: var(--ink); background: var(--bg); }
+  h1, h2, h3 { line-height: 1.15; margin: 0 0 .5em; letter-spacing: -.02em; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  .demo { background: #111; color: #fff; text-align: center; font-size: 13px; padding: 6px 16px; }
+  header { background: var(--bg); border-bottom: 1px solid rgba(0,0,0,.08); }
+  header .wrap { display: flex; justify-content: space-between; align-items: center; min-height: 64px; gap: 12px; }
+  .logo { font-weight: 800; font-size: 1.15rem; display: flex; align-items: center; gap: 8px; }
+  .btn { display: inline-block; background: var(--accent); color: var(--accent-ink); font-weight: 700; padding: 13px 22px; border-radius: 10px; text-decoration: none; border: 0; font-size: 1rem; font-family: inherit; cursor: pointer; }
+  .btn.sm { padding: 9px 14px; font-size: .92rem; white-space: nowrap; }
+  .btn.line { background: transparent; color: #ffffff; border: 2px solid rgba(255,255,255,.7); }
+  .hero { background: linear-gradient(150deg, #1e4d2b, #3c7a3f); color: #ffffff; padding: 80px 0 88px; }
+  .hero h1 { font-size: clamp(2.1rem, 6vw, 3.5rem); max-width: 14em; }
+  .hero p { font-size: 1.2rem; color: rgba(255,255,255,.82); max-width: 34em; margin: 0 0 28px; }
+  .hero .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  section { padding: 64px 0; }
+  .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin-top: 28px; }
+  .card { background: #fff; border-radius: 14px; padding: 22px; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px -16px rgba(0,0,0,.2); }
+  .card p { margin: 0; color: #5b6470; }
+  .kicker { color: var(--accent); font-weight: 700; font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; }
+  .band { background: var(--soft); }
+  .about { max-width: 42em; font-size: 1.1rem; }
+  .areas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; padding: 0; list-style: none; }
+  .areas li { background: #fff; border-radius: 99px; padding: 6px 14px; font-weight: 600; font-size: .95rem; }
+  .photos { display: grid; gap: 12px; grid-template-columns: repeat(3, 1fr); margin-top: 24px; }
+  .photos div, .photos img { aspect-ratio: 4/3; border-radius: 12px; width: 100%; }
+  .photos img { object-fit: cover; display: block; }
+  .photos div { border: 2px dashed rgba(0,0,0,.18); display: grid; place-items: center; color: #8a929c; font-size: .9rem; text-align: center; padding: 8px; background: #fff; }
+  @media (max-width: 640px) { .photos { grid-template-columns: 1fr 1fr; } .photos div:nth-child(3) { display: none; } }
+  .contact { text-align: center; }
+  .contact p { color: #5b6470; }
+  .form { display: grid; gap: 12px; max-width: 560px; margin: 24px auto 0; text-align: left; }
+  .form label { display: grid; gap: 4px; font-weight: 600; font-size: .95rem; }
+  .form input, .form textarea { font: inherit; padding: 11px 13px; border-radius: 10px; border: 1px solid rgba(0,0,0,.18); background: #fff; width: 100%; }
+  .form textarea { min-height: 100px; }
+  .row { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+  footer { padding: 28px 0; font-size: .9rem; color: #6b7280; border-top: 1px solid rgba(0,0,0,.08); }
+  .callbar { display: none; }
+  @media (max-width: 640px) {
+    .callbar { display: block; position: fixed; left: 12px; right: 12px; bottom: 12px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+    footer { padding-bottom: 90px; }
+    header .btn { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="demo">Sample site by Bluebonnet Web. Not a real business.</div>
+<header>
+  <div class="wrap">
+    <div class="logo"><span>🌳</span>Sample Landscapes</div>
+    <a class="btn sm" href="#contact">Request a free estimate</a>
+  </div>
+</header>
+<main>
+<section class="hero">
+  <div class="wrap">
+    <h1>Outdoor spaces built for Texas weather</h1>
+    <p>Landscape design, installs, and upkeep for homes and businesses around Dripping Springs.</p>
+    <div class="actions">
+      <a class="btn" href="#contact">Request a free estimate</a>
+      
+    </div>
+  </div>
+</section>
+<section>
+  <div class="wrap">
+    <div class="kicker">What we do</div>
+    <h2>Services</h2>
+    <div class="grid">
+      <div class="card"><h3>Landscape design</h3><p>A plan that fits your space, your budget, and the Central Texas climate.</p></div>
+      <div class="card"><h3>Planting &amp; installs</h3><p>Trees, shrubs, and beds put in properly so they last.</p></div>
+      <div class="card"><h3>Hardscaping</h3><p>Paths, borders, and patios that tie the yard together.</p></div>
+      <div class="card"><h3>Ongoing maintenance</h3><p>Keep it looking like install day, all year.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="kicker">Service area</div>
+    <h2>Proudly serving Dripping Springs and nearby</h2>
+    <ul class="areas"><li>📍 Dripping Springs</li></ul>
+  </div>
+</section>
+<section>
+  <div class="wrap">
+    <div class="kicker">Our work</div>
+    <h2>Recent jobs</h2>
+    <div class="photos"><div>Your photo here</div><div>Your photo here</div><div>Your photo here</div></div>
+  </div>
+</section>
+<section class="band contact" id="contact">
+  <div class="wrap">
+    <h2>Request a free estimate</h2>
+    <p>Tell us what you need and we’ll get back to you.</p>
+    
+    
+    
+  </div>
+</section>
+</main>
+<footer><div class="wrap">© 2026 Sample Landscapes · Dripping Springs, Texas</div></footer>
+
+</body>
+</html>

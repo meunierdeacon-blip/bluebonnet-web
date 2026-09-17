@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /bluebonnet-web/samples/
+
+Sitemap: https://meunierdeacon-blip.github.io/bluebonnet-web/sitemap.xml
