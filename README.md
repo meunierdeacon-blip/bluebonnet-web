@@ -16,8 +16,8 @@ Open `src/site.mjs` and fill in:
 | Setting | What to put |
 |---|---|
 | `name` | Your business name (Bluebonnet Web is a placeholder, so rename it if you like) |
-| `email` | A business email for quote requests. Not a school account. |
-| `url` | Your real domain once you have one |
+| `email` | Where quote requests go (currently meunierdeacon@gmail.com) |
+| `url` | The live address (currently the GitHub Pages one) |
 | `PLANS` | Your prices |
 
 Then read through the pages and change anything that isn’t true for you. In particular:
@@ -34,7 +34,8 @@ These are sensible defaults, not promises you’ve made yet.
 |---|---|
 | Build the site | `node build.mjs` |
 | Check for broken links and SEO problems | `node scripts/check.mjs` |
-| Preview locally | `node scripts/serve.mjs`, then open http://localhost:4322 |
+| Preview locally | `node scripts/serve.mjs`, then open http://localhost:4322/bluebonnet-web/ |
+| Publish to the live site | `node scripts/deploy.mjs` |
 | List trades and color themes for mockups | `node mockup.mjs --list` |
 | Mockup for one business | `node mockup.mjs --name "Hill Country Lawn" --trade "lawn care" --town Lakeway --phone "(512) 555-0100" --shot` |
 | Mockup with custom services | copy `leads/example-lawn.json`, edit it, then `node mockup.mjs leads/your-file.json --shot` |
@@ -101,12 +102,18 @@ The Local SEO Site plan ($900) needs more pages than this one-page template make
 
 ## Putting it online
 
-The build output in `dist/` is plain static files, so any static host works. Netlify credits are used up on Waterline, so use a different free host for this one:
+The site is live on GitHub Pages at **https://meunierdeacon-blip.github.io/bluebonnet-web/** (repo: github.com/meunierdeacon-blip/bluebonnet-web).
 
-- **Cloudflare Pages:** `npx wrangler pages deploy dist --project-name bluebonnet-web`
-- **GitHub Pages / Vercel:** point them at a repo and use `node build.mjs` as the build command and `dist` as the output folder.
+To publish changes:
 
-Set `url` in `src/site.mjs` to the real domain and rebuild before going live, so the sitemap and canonical links are right.
+```bash
+git add -A && git commit -m "Describe the change" && git push
+node scripts/deploy.mjs
+```
+
+`deploy.mjs` builds, runs the checker, and force-pushes `dist/` to the `gh-pages` branch. Only source code is public. `leads/`, `mockups/`, `clients/`, and `PITCHES.md` are git-ignored.
+
+**Moving to your own domain later:** buy it, add a `CNAME` file containing the domain to `src/static/`, point the domain's DNS at GitHub Pages, set it under the repo's Settings → Pages, change `url` in `src/site.mjs` to `https://yourdomain.com` (no path), then deploy.
 
 ## Layout
 
@@ -121,5 +128,6 @@ mockup/render.mjs     the one-page demo site template
 mockup.mjs            mockup + client site command
 scripts/check.mjs     build checker
 scripts/serve.mjs     local preview server
+scripts/deploy.mjs    publish to GitHub Pages
 _archive/             the original single-file version
 ```
