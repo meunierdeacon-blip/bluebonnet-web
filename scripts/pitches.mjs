@@ -5,6 +5,9 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE } from '../src/site.mjs';
+
+// Who signs the messages. Change this if you go by something else, or if Ethan is sending them.
+const SIGNER = 'Deacon';
 import { INDUSTRIES } from '../src/industries.mjs';
 import { slugify } from '../mockup/render.mjs';
 import { parseCsv } from '../mockup/csv.mjs';
@@ -25,15 +28,17 @@ const reviewsOf = (notes) => {
 
 let out = `# Ready-to-send pitches (updated ${new Date().toISOString().slice(0, 10)})
 
-Each business below has a demo in \`mockups/<folder>/\`. Text them \`phone.png\`, then \`desktop.png\` if they reply.
+Each business below was verified the same day it was added: found on Google Maps, phone cross-checked against another listing, and no website found anywhere. Every one has a demo in \`mockups/<folder>/\`.
+
+**Sending a screenshot?** Attach \`phone.png\` from their folder. The messages below don't mention a screenshot, so they work either way.
 
 **Your live site:** https://${live}/ (quote requests go to ${SITE.email || 'the email in src/site.mjs'})
 
-**How to send:** from your own phone, during business hours (weekdays 9–5). Replace [Your name]. Send one at a time, not a group message. If someone says no or asks you to stop, mark them \`lost\` in \`leads/leads.csv\` and don't contact them again.
+**How to send:** from your own phone, during business hours (weekdays 9–5). Calling works better than texting for these: some business numbers are landlines or answering services that can't receive texts. Send one at a time, not a group message. If someone says no or asks you to stop, mark them \`lost\` in \`leads/leads.csv\` and don't contact them again.
 
 **After sending:** set \`status\` to \`contacted\` and fill in the \`contacted\` date. Follow up once 3–4 days later, then stop.
 
-**Calling works too:** "Hi, is this the owner? I'm [Your name], I build websites for local businesses around Austin. I noticed you don't have a website, so I made you a free sample of what one could look like. Can I text you a screenshot? No cost, no pressure."
+**Phone script:** "Hi, is this the owner? I'm ${SIGNER}, I build websites for local businesses around Austin. I noticed you've got great reviews but no website, so I put together a free sample of what one could look like. Can I text or email it to you? No cost, no pressure."
 
 ---
 `;
@@ -50,10 +55,10 @@ leads.forEach((r, i) => {
 - **Phone:** ${r.phone} · **Reach by:** ${r.contact}
 - **Demo:** \`mockups/${slugify(r.name)}/\` · **Notes:** ${r.notes}
 
-> ${opener} I'm [Your name]. My partner and I build simple websites for local businesses so people searching Google can find you and book. I made you a free sample of what yours could look like (screenshot attached). ${proof} Happy to chat if you're interested, and no worries if not!
+> ${opener} I'm ${SIGNER}. My partner and I build simple websites for local businesses so people searching Google can find you and book. I'd be happy to make you a free sample of what yours could look like. ${proof} Happy to chat if you're interested, and no worries if not!
 
 **Follow-up (3–4 days later, only if no reply):**
-> Hi, just following up on the sample site I sent for ${r.name}. Want me to send over pricing? If not, no worries. I won't message again.
+> Hi, just following up on my message about a website for ${r.name}. Want me to put together that free sample, or send over pricing? If not, no worries. I won't message again.
 `;
 });
 
