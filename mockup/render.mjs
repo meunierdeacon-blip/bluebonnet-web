@@ -1,5 +1,5 @@
 // Renders a one-page small-business website from a lead object. Used by mockup.mjs and by build.mjs
-// (for the sample sites linked from each industry page).
+// (for the sample sites linked from each industry page), and by the builder app (app/), in Node and in the browser.
 //
 // Mockup mode (default): demo banner across the top, noindex, photo placeholders.
 // Final mode ({ final: true }): no banner, indexable, meta description, LocalBusiness schema built only from
@@ -10,12 +10,12 @@ export const slugify = (s) => s.toLowerCase().replace(/['’]/g, '').replace(/&/
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-export function renderMockup(lead, { banner = `Free demo for ${lead.name}. Not live yet.`, final = false } = {}) {
+export function renderMockup(lead, { banner = `Free demo for ${lead.name}. Not live yet.`, final = false, quiet = false } = {}) {
   const tradeKey = lead.trade.toLowerCase();
   const preset = PRESETS[tradeKey] || DEFAULT_PRESET;
-  if (!PRESETS[tradeKey]) console.warn(`! No preset for "${lead.trade}". Using generic copy; edit services in a JSON file.`);
+  if (!PRESETS[tradeKey] && !quiet) console.warn(`! No preset for "${lead.trade}". Using generic copy; edit services in a JSON file.`);
   const theme = THEMES[lead.theme || preset.theme] || THEMES.slate;
-  if (lead.theme && !THEMES[lead.theme]) console.warn(`! Unknown theme "${lead.theme}", using ${preset.theme}.`);
+  if (lead.theme && !THEMES[lead.theme] && !quiet) console.warn(`! Unknown theme "${lead.theme}", using ${preset.theme}.`);
 
   const fill = (s) => s.replaceAll('{town}', lead.town);
   const services = (lead.services || preset.services).map((s) => (Array.isArray(s) ? { name: s[0], blurb: s[1] } : s));

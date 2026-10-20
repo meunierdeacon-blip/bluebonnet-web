@@ -1,13 +1,14 @@
 # Bluebonnet Web
 
-A website business in a box. Two parts:
+A website business in a box. Three parts:
 
 1. **The business website** (`src/` → `dist/`): home, pricing, a free website check, your work, and a landing page plus sample site for 10 trades.
 2. **The sales tools** (`mockup.mjs`, `leads/`): make a free demo site for a prospect in seconds, then send it with your pitch.
+3. **The builder app** (`app/`): business owners build, save, and publish their own site. See [The builder app](#the-builder-app).
 
 How to actually get clients is in [PLAYBOOK.md](PLAYBOOK.md). Start there.
 
-No npm install needed. Just Node 18+ (and Google Chrome for screenshots).
+No npm install needed. Just Node 18+ (Node 22.13+ for the builder app, and Google Chrome for screenshots).
 
 ## Before you share anything
 
@@ -117,6 +118,20 @@ node scripts/deploy.mjs
 
 **Moving to your own domain later:** buy it, add a `CNAME` file containing the domain to `src/static/`, point the domain's DNS at GitHub Pages, set it under the repo's Settings → Pages, change `url` in `src/site.mjs` to `https://yourdomain.com` (no path), then deploy.
 
+## The builder app
+
+A self-serve version of the mockup tool: an owner picks their trade, fills in a form, watches their site update live (phone and desktop), creates an account, and publishes.
+
+```bash
+node app/server.mjs        # http://localhost:4330
+```
+
+- `/` landing page · `/build` the builder (works before signing up; the draft stays in the browser) · `/signup` `/login` · `/s/<slug>/` published sites
+- The preview and the live site use the same template (`mockup/render.mjs`), so what owners see is what gets published.
+- Accounts and sites are saved in `app/data/bluebonnet.db` (built-in SQLite, git-ignored). Passwords are hashed with scrypt; sessions are 30-day HttpOnly cookies.
+- Published sites get a "Website made with Bluebonnet" credit in the footer.
+- **Local only for now.** Still to do before real businesses can use it: payments (Stripe), hosting with a real domain, photo uploads, password reset, and custom domains.
+
 ## Layout
 
 ```
@@ -131,5 +146,9 @@ mockup.mjs            mockup + client site command
 scripts/check.mjs     build checker
 scripts/serve.mjs     local preview server
 scripts/deploy.mjs    publish to GitHub Pages
+app/server.mjs        builder app: routes, validation, published sites
+app/db.mjs            builder app: accounts, sessions, saved sites (SQLite)
+app/pages.mjs         builder app: landing, sign-up/log-in, builder HTML
+app/public/           builder app: browser code and CSS
 _archive/             the original single-file version
 ```

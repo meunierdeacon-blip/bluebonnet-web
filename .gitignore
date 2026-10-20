@@ -7,3 +7,5 @@ leads/*
 !leads/example-lawn.json
 .DS_Store
 PITCHES.md
+# Builder app database: customer emails and password hashes
+app/data/
