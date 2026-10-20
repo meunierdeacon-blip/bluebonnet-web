@@ -131,7 +131,7 @@ node app/server.mjs        # http://localhost:4330
 - Accounts and sites are saved in `app/data/bluebonnet.db` (built-in SQLite, git-ignored). Passwords are hashed with scrypt; sessions are 30-day HttpOnly cookies.
 - Published sites get a "Website made with Bluebonnet" credit in the footer.
 - Billing (Stripe subscriptions), customer subdomains, password reset emails, and Terms/Privacy pages are built in. Each turns on when its setting is added; with nothing set, publishing is free and emails print in the terminal.
-- **To put it online:** follow [LAUNCH.md](LAUNCH.md) (Fly.io, a domain, Stripe, Resend).
+- **To put it online:** follow [LAUNCH.md](LAUNCH.md) (Railway, a domain, Stripe, Resend). Deploy config: `Dockerfile` + `railway.json`.
 - Not built yet: photo uploads and customers' own custom domains.
 
 ## Layout

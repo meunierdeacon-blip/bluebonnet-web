@@ -1,7 +1,7 @@
 // Accounts, sessions, and saved sites, in one SQLite file (Node's built-in node:sqlite, no packages).
 // The file lives at app/data/bluebonnet.db and is git-ignored: it holds customers' emails and password hashes.
 import { DatabaseSync } from 'node:sqlite';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readdirSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { randomBytes, scryptSync, timingSafeEqual, createHash } from 'node:crypto';
 import { slugify } from '../mockup/render.mjs';
@@ -158,4 +158,18 @@ export function saveSite(userId, data) {
 export function setPublished(userId, published) {
   db.prepare(`UPDATE sites SET published = ?, updated_at = datetime('now') WHERE user_id = ?`).run(published ? 1 : 0, userId);
   return siteForUser(userId);
+}
+
+// ---- Daily backups: a full copy of the database in <data>/backups/, keeping the last 14 days.
+// They sit on the same volume, so they undo mistakes and bad data. Download one now and then for an off-site copy.
+const KEEP_DAYS = 14;
+export function backupToday() {
+  const dir = join(CONFIG.dataDir, 'backups');
+  mkdirSync(dir, { recursive: true });
+  const file = join(dir, `bluebonnet-${new Date().toISOString().slice(0, 10)}.db`);
+  if (existsSync(file)) return null;
+  db.exec(`VACUUM INTO '${file.replaceAll("'", "''")}'`);
+  const old = readdirSync(dir).filter((f) => /^bluebonnet-\d{4}-\d{2}-\d{2}\.db$/.test(f)).sort().slice(0, -KEEP_DAYS);
+  for (const f of old) rmSync(join(dir, f));
+  return file;
 }

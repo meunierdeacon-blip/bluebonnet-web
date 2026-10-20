@@ -1,5 +1,5 @@
 // Settings for the builder app. Everything account-specific comes from environment variables, so the same code
-// runs on your laptop (nothing set: free publishing, emails printed in the terminal) and on Fly.io (secrets set).
+// runs on your laptop (nothing set: free publishing, emails printed in the terminal) and on Railway (variables set).
 // The full list, and how to set each one, is in LAUNCH.md.
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

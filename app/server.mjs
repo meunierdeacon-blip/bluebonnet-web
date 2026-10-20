@@ -115,7 +115,8 @@ const readJson = async (req) => {
 // Simple per-IP limit on the account endpoints, so nobody can guess passwords or spam reset emails.
 // In memory: resets when the app restarts, which is fine at this size.
 const hits = new Map();
-const clientIp = (req) => req.headers['fly-client-ip'] || req.socket.remoteAddress || '';
+// Railway's proxy puts the visitor's real IP in X-Real-IP
+const clientIp = (req) => req.headers['x-real-ip'] || req.socket.remoteAddress || '';
 function tooMany(req, bucket, max, windowMs = 15 * 60e3) {
   const key = `${bucket}:${clientIp(req)}`;
   const now = Date.now();
@@ -289,6 +290,10 @@ createServer((req, res) => {
     if (!res.headersSent) json(res, err.status || 500, { error: err.status ? err.message : 'Something went wrong. Try again.' });
   });
 }).listen(CONFIG.port, () => {
+  // Back up now if today's copy doesn't exist yet, then check again every 6 hours
+  const backup = () => { try { const f = db.backupToday(); if (f) console.log(`Backup saved: ${f}`); } catch (err) { console.error('Backup failed:', err); } };
+  backup();
+  setInterval(backup, 6 * 3600e3).unref();
   console.log(`Bluebonnet builder at http://localhost:${CONFIG.port}`);
   console.log(`  billing: ${billingEnabled() ? 'ON (Stripe)' : 'off (publishing is free)'} · sites at: ${siteUrl('<slug>')} · email: ${CONFIG.email.resendKey ? 'Resend' : 'printed here'}`);
 });

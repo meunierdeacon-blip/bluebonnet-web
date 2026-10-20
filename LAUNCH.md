@@ -1,32 +1,29 @@
 # Launching the Bluebonnet builder
 
 The code is ready. Launching it takes accounts that only you (and, for Stripe, a parent) can create.
-Do the steps in order. Each one says what to send Claude when you're done, so it can do the next part.
+Do the steps in order. Each one says what to tell Claude when you're done, so it can do the next part.
 
-**Cost:** about $2–3/month for Fly.io, about $10–15/year for the domain, and Stripe takes ~2.9% + 30¢ per payment. Email (Resend) is free at this size.
+**Cost:** Railway Hobby is $5/month, which includes $5 of usage, and this app fits inside it. A domain is about $10–15/year. Stripe takes ~2.9% + 30¢ per payment. Email (Resend) is free at this size.
+
+> Why Railway and not Fly.io: this laptop's school web filter (Securly) blocks `api.fly.io`, which every Fly command needs. Railway works from here.
 
 ---
 
-## Step 1. Fly.io (hosting): you
+## Step 1. Railway (hosting): you
 
-1. Sign up at **fly.io** and add a card. Fly needs one even for small apps.
-2. Install Fly's command-line tool by pasting this in Terminal:
-   ```bash
-   curl -L https://fly.io/install.sh | sh
-   ```
-3. Log in. This opens your browser:
-   ```bash
-   ~/.fly/bin/flyctl auth login
-   ```
+1. Sign up at **railway.com**. "Sign in with GitHub" is easiest; use the `meunierdeacon-blip` account.
+2. Choose the **Hobby** plan ($5/month) and add a card. The free trial can't hold a domain plus customer subdomains.
 
-**Then tell Claude:** "Fly is set up." Claude will create the app and its storage, deploy it, and show you the address (`https://bluebonnet-builder.fly.dev`). Claude asks you before anything that adds to your bill.
+**Then tell Claude:** "Railway is set up." Claude will install Railway's command-line tool (the `@railway/cli` npm package) and start the login. A browser page asks you to approve it. Then Claude creates the project and its storage (a 5 GB volume at `/data`), deploys, and gives you a working `….up.railway.app` link.
 
 ## Step 2. Domain: you
 
 1. Buy a domain, like `bluebonnetsites.com`, at Cloudflare Registrar, Namecheap, or Porkbun (~$10–15/year).
 2. Leave its DNS settings page open.
 
-**Then tell Claude:** "My domain is ____." Claude will tell you exactly which DNS records to add, set up HTTPS for the domain and every customer subdomain (`juarez-lawn.yourdomain.com`), and switch the app over.
+**Then tell Claude:** "My domain is ____." Claude will add two custom domains in Railway, your domain and `*.yourdomain` for customer sites (Hobby allows exactly 2), and tell you exactly which DNS records to copy in. There's a CNAME for each, plus a TXT and an `_acme-challenge` CNAME so Railway can issue the HTTPS certificate. Then Claude switches the app to the new addresses. If your domain is on Cloudflare, turn **off** the orange-cloud proxy on the `_acme-challenge` record.
+
+DNS changes usually work within an hour but can take up to 72.
 
 ## Step 3. Stripe (payments): you and a parent
 
@@ -45,22 +42,27 @@ Stripe requires an adult as the account owner if you're under 18.
 
    Copy the **signing secret** (`whsec_...`).
 5. **Developers → API keys:** copy the **secret key** (`sk_test_...`).
-6. Save them into the app yourself. Don't paste keys into chat. Run this in Terminal from this folder, with your values filled in:
-   ```bash
-   ~/.fly/bin/flyctl secrets set STRIPE_SECRET_KEY=sk_test_... STRIPE_WEBHOOK_SECRET=whsec_... STRIPE_PRICE_MONTHLY=price_... STRIPE_PRICE_YEARLY=price_...
-   ```
+6. Save them in Railway yourself. Don't paste keys into chat. In the Railway dashboard, open the **bluebonnet** service, go to **Variables → New Variable**, and add:
 
-**Then tell Claude:** "Stripe test keys are set." Claude will run a test purchase with Stripe's fake card: `4242 4242 4242 4242`, any future date, any CVC.
+   | Name | Value |
+   |---|---|
+   | `STRIPE_SECRET_KEY` | `sk_test_...` |
+   | `STRIPE_WEBHOOK_SECRET` | `whsec_...` |
+   | `STRIPE_PRICE_MONTHLY` | `price_...` (the $15 one) |
+   | `STRIPE_PRICE_YEARLY` | `price_...` (the $150 one) |
+
+   Railway redeploys on its own when you save.
+
+**Then tell Claude:** "Stripe test keys are set." Claude will check that billing is on and walk you through a test purchase with Stripe's fake card: `4242 4242 4242 4242`, any future date, any CVC.
 
 ## Step 4. Email (password reset): you
 
 1. Sign up at **resend.com** (free). Under **Domains**, add your domain and copy the DNS records it shows into your domain's DNS settings.
-2. Create an **API key**, then run:
-   ```bash
-   ~/.fly/bin/flyctl secrets set RESEND_API_KEY=re_... EMAIL_FROM="Bluebonnet <hello@YOUR-DOMAIN>"
-   ```
+2. Create an **API key**. In Railway **Variables**, add:
+   - `RESEND_API_KEY` = `re_...`
+   - `EMAIL_FROM` = `Bluebonnet <hello@YOUR-DOMAIN>`
 
-**Then tell Claude:** "Email is set." Claude will send a test reset email.
+**Then tell Claude:** "Email is set." Claude will help you send yourself a test reset email.
 
 ## Step 5. Before real customers: you and a parent
 
@@ -71,7 +73,7 @@ Stripe requires an adult as the account owner if you're under 18.
 
 ---
 
-## Reference: all settings
+## Reference: all settings (Railway → service → Variables)
 
 | Setting | What it is | Example |
 |---|---|---|
@@ -81,15 +83,19 @@ Stripe requires an adult as the account owner if you're under 18.
 | `STRIPE_SECRET_KEY` | Turns billing on. Without it, publishing is free. | `sk_test_...` |
 | `STRIPE_WEBHOOK_SECRET` | Proves webhook calls really come from Stripe | `whsec_...` |
 | `STRIPE_PRICE_MONTHLY` / `_YEARLY` | The two prices from Step 3 | `price_...` |
-| `RESEND_API_KEY`, `EMAIL_FROM` | Sends password reset emails. Without them, emails print in the server log. | `re_...` |
+| `RESEND_API_KEY`, `EMAIL_FROM` | Sends password reset emails. Without them, emails print in the deploy logs. | `re_...` |
+
+Railway sets `PORT` itself. The Dockerfile sets `BLUEBONNET_DATA=/data`, which is where the volume is mounted.
 
 The displayed prices ($15 / $150) are in `app/config.mjs` (`PLAN_LABELS`). Change them there if you change them in Stripe.
 
-**Useful commands** (from this folder):
+**Backups:** the app saves a full copy of the database every day to `/data/backups/` and keeps 14 days. Those copies live on the same volume, so they protect against mistakes, not against the volume being deleted. Railway's own volume backups (service → **Backups** tab) are worth turning on if your plan shows them.
+
+**Useful commands** (from this folder, after Step 1):
 ```bash
-~/.fly/bin/flyctl deploy            # publish code changes
-~/.fly/bin/flyctl logs              # watch what the app is doing
-~/.fly/bin/flyctl volumes snapshots list bluebonnet_data   # daily backups
+~/.npm-global/bin/railway up --detach   # publish code changes
+~/.npm-global/bin/railway logs          # watch what the app is doing
+~/.npm-global/bin/railway open          # open the project dashboard
 ```
 
-Run only **one** machine. All accounts and sites are in one SQLite file on one volume.
+Run only **one** replica. All accounts and sites are in one SQLite file on one volume.
