@@ -1,20 +1,26 @@
-// Bluebonnet builder: business owners make, save, and publish their own website.
+// Bluebonnet builder: business owners make, save, pay for, and publish their own website.
 // Run: node app/server.mjs  → http://localhost:4330   (no packages to install; needs Node 22.13+ for node:sqlite)
+// Settings come from environment variables (see config.mjs and LAUNCH.md). With none set, billing is off and
+// published sites live at /s/<slug>/; with BASE_DOMAIN set, they live at <slug>.<BASE_DOMAIN>.
 //
-//   /              landing page          /build        the builder (works before signing up; draft kept in the browser)
-//   /signup /login accounts              /s/<slug>/    a published business site
-//   /api/...       JSON used by the builder (all writes require a JSON body, which plain cross-site forms can't send)
+//   /                landing page             /build        the builder (works before signing up; draft kept in the browser)
+//   /signup /login   accounts                 /forgot /reset password reset by email
+//   /terms /privacy  legal pages              /api/...      JSON used by the builder
+//   /api/stripe/webhook  Stripe tells us when subscriptions start, change, or end
+// All writes except the webhook require a JSON body, which plain cross-site forms can't send.
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderMockup } from '../mockup/render.mjs';
 import { THEMES } from '../mockup/presets.mjs';
+import { CONFIG, PLAN_LABELS, billingEnabled, siteUrl } from './config.mjs';
 import * as db from './db.mjs';
-import { landingPage, authPage, builderPage, notFoundPage } from './pages.mjs';
+import * as stripe from './stripe.mjs';
+import { sendEmail } from './email.mjs';
+import { landingPage, authPage, builderPage, notFoundPage, legalPage } from './pages.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const PORT = Number(process.env.PORT) || 4330;
 
 // Files the browser needs. The builder imports the same renderer the server uses, so the preview matches the live site.
 const STATIC = {
@@ -39,6 +45,7 @@ const APP_CSP = [
 
 // ---- Validating what the builder sends. Everything is length-capped; the renderer escapes it all on output.
 const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function cleanSite(input) {
   const d = input && typeof input === 'object' ? input : {};
   const site = {
@@ -58,7 +65,7 @@ export function cleanSite(input) {
       .map((s) => ({ name: str(s?.name, 60), blurb: str(s?.blurb, 200) })).filter((s) => s.name).slice(0, 8),
   };
   const missing = [['name', 'business name'], ['trade', 'type of business'], ['town', 'main town']].filter(([k]) => !site[k]).map(([, label]) => label);
-  if (site.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(site.email)) return { error: 'That email address doesn’t look right.' };
+  if (site.email && !EMAIL_RE.test(site.email)) return { error: 'That email address doesn’t look right.' };
   return missing.length ? { error: `Add your ${missing.join(' and ')} first.` } : { site };
 }
 
@@ -67,8 +74,13 @@ export const toLead = (site, extra = {}) => Object.fromEntries(
   Object.entries({ ...site, ...extra }).filter(([, v]) => v !== '' && !(Array.isArray(v) && !v.length)),
 );
 
+// A site is on the internet when its owner pressed Publish and (once billing is on) is paying
+const isLive = (site) => !!site?.published && (!billingEnabled() || site.ownerPaying);
+
 // Credit line added to every published site's footer (also how other business owners find us)
-const CREDIT = ' · <a href="/" style="color:inherit">Website made with Bluebonnet 🌼</a>';
+const CREDIT = ` · <a href="${CONFIG.appUrl}/" style="color:inherit">Website made with Bluebonnet 🌼</a>`;
+const renderLiveSite = (site) => renderMockup(toLead(site.data, { url: siteUrl(site.slug) }), { final: true, quiet: true })
+  .replace('</div></footer>', `${CREDIT}</div></footer>`);
 
 // ---- Small helpers
 const cookies = (req) => Object.fromEntries((req.headers.cookie || '').split(/;\s*/).filter(Boolean).map((c) => {
@@ -84,25 +96,69 @@ const send = (res, status, body, headers = {}) => {
 };
 const html = (res, status, body) => send(res, status, body, { 'content-type': 'text/html; charset=utf-8', 'content-security-policy': APP_CSP });
 const json = (res, status, obj, headers) => send(res, status, JSON.stringify(obj), { 'content-type': 'application/json', 'cache-control': 'no-store', ...headers });
+const siteHtml = (res, site) => send(res, 200, renderLiveSite(site), { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache' });
 
-const readJson = (req) => new Promise((resolve, reject) => {
-  if (!(req.headers['content-type'] || '').startsWith('application/json')) return reject(Object.assign(new Error('Expected JSON'), { status: 415 }));
+const readBody = (req) => new Promise((resolve, reject) => {
   let body = '';
   req.on('data', (c) => {
     body += c;
     if (body.length > 64_000) { reject(Object.assign(new Error('Too much data'), { status: 413 })); req.destroy(); }
   });
-  req.on('end', () => { try { resolve(JSON.parse(body || '{}')); } catch { reject(Object.assign(new Error('Bad JSON'), { status: 400 })); } });
+  req.on('end', () => resolve(body));
   req.on('error', reject);
 });
+const readJson = async (req) => {
+  if (!(req.headers['content-type'] || '').startsWith('application/json')) throw Object.assign(new Error('Expected JSON'), { status: 415 });
+  try { return JSON.parse((await readBody(req)) || '{}'); } catch (e) { throw e.status ? e : Object.assign(new Error('Bad JSON'), { status: 400 }); }
+};
 
-const publicSite = (s) => s && { slug: s.slug, data: s.data, published: s.published, updatedAt: s.updatedAt, url: `/s/${s.slug}/` };
+// Simple per-IP limit on the account endpoints, so nobody can guess passwords or spam reset emails.
+// In memory: resets when the app restarts, which is fine at this size.
+const hits = new Map();
+const clientIp = (req) => req.headers['fly-client-ip'] || req.socket.remoteAddress || '';
+function tooMany(req, bucket, max, windowMs = 15 * 60e3) {
+  const key = `${bucket}:${clientIp(req)}`;
+  const now = Date.now();
+  const h = hits.get(key);
+  if (!h || h.reset < now) { hits.set(key, { count: 1, reset: now + windowMs }); return false; }
+  return ++h.count > max;
+}
+setInterval(() => { const now = Date.now(); for (const [k, h] of hits) if (h.reset < now) hits.delete(k); }, 60e3).unref();
+
+const publicSite = (s) => s && { slug: s.slug, data: s.data, published: s.published, live: isLive(s), updatedAt: s.updatedAt, url: siteUrl(s.slug) };
+const publicUser = (u) => u && { email: u.email, paying: u.paying, hasBilling: !!u.stripeCustomerId };
 const cleanEmail = (e) => str(e, 120).toLowerCase();
+const validPassword = (p) => (typeof p !== 'string' || p.length < 8 ? 'Use a password with at least 8 characters.' : p.length > 200 ? 'That password is too long.' : '');
+const loginWith = (req, res, status, userId) => {
+  const s = db.createSession(userId);
+  return json(res, status, { ok: true }, { 'set-cookie': sessionCookie(req, s.token, s.maxAge) });
+};
+
+// ---- Customer sites on their own subdomain: juarez-lawn.bluebonnetsites.com
+function subdomainOf(req) {
+  if (!CONFIG.baseDomain) return null;
+  const host = (req.headers.host || '').toLowerCase().replace(/:\d+$/, '');
+  if (!host.endsWith(`.${CONFIG.baseDomain}`)) return null;
+  return host.slice(0, -(CONFIG.baseDomain.length + 1));
+}
 
 // ---- Routes
 async function handle(req, res) {
   const url = new URL(req.url, 'http://localhost');
   const path = url.pathname;
+
+  if (path === '/healthz') return send(res, 200, 'ok', { 'content-type': 'text/plain' });
+
+  const sub = subdomainOf(req);
+  if (sub === 'www') return send(res, 301, '', { location: `https://${CONFIG.baseDomain}${req.url}` });
+  if (sub) {
+    const site = /^[a-z0-9-]+$/.test(sub) && db.siteBySlug(sub);
+    if (req.method !== 'GET' || path !== '/' || !isLive(site)) return html(res, 404, notFoundPage());
+    return siteHtml(res, site);
+  }
+
+  if (req.method === 'POST' && path === '/api/stripe/webhook') return stripeWebhook(req, res);
+
   const token = cookies(req).bb_session;
   const user = db.sessionUser(token);
 
@@ -113,19 +169,25 @@ async function handle(req, res) {
     }
     if (path === '/') return html(res, 200, landingPage({ user }));
     if (path === '/build') return html(res, 200, builderPage({ user }));
-    if (path === '/signup' || path === '/login') {
-      if (user) return send(res, 302, '', { location: '/build' });
+    if (['/signup', '/login', '/forgot', '/reset'].includes(path)) {
+      if (user && path !== '/reset') return send(res, 302, '', { location: '/build' });
       return html(res, 200, authPage({ mode: path.slice(1) }));
     }
-    if (path === '/api/me') return json(res, 200, { user, site: user ? publicSite(db.siteForUser(user.id)) : null });
+    if (path === '/terms' || path === '/privacy') return html(res, 200, legalPage(path.slice(1)));
+    if (path === '/api/me') {
+      return json(res, 200, {
+        user: publicUser(user),
+        site: user ? publicSite(db.siteForUser(user.id)) : null,
+        billing: { enabled: billingEnabled(), plans: PLAN_LABELS },
+      });
+    }
 
     const m = path.match(/^\/s\/([a-z0-9-]+)\/?$/);
     if (m) {
+      if (CONFIG.baseDomain) return send(res, 301, '', { location: siteUrl(m[1]) });
       if (!path.endsWith('/')) return send(res, 301, '', { location: `${path}/` });
       const site = db.siteBySlug(m[1]);
-      if (!site?.published) return html(res, 404, notFoundPage());
-      const page = renderMockup(toLead(site.data, { url: `${isHttps(req) ? 'https' : 'http'}://${req.headers.host}/s/${site.slug}/` }), { final: true, quiet: true });
-      return send(res, 200, page.replace('</div></footer>', `${CREDIT}</div></footer>`), { 'content-type': 'text/html; charset=utf-8' });
+      return isLive(site) ? siteHtml(res, site) : html(res, 404, notFoundPage());
     }
     return html(res, 404, notFoundPage());
   }
@@ -136,28 +198,50 @@ async function handle(req, res) {
   if (origin && new URL(origin).host !== req.headers.host) return json(res, 403, { error: 'Cross-site request refused' });
   const body = await readJson(req);
 
+  // -- Accounts
+  if (['/api/signup', '/api/login', '/api/forgot', '/api/reset'].includes(path) && tooMany(req, path, path === '/api/forgot' ? 5 : 20)) {
+    return json(res, 429, { error: 'Too many tries. Wait 15 minutes and try again.' });
+  }
   if (path === '/api/signup') {
     const email = cleanEmail(body.email);
-    const password = typeof body.password === 'string' ? body.password : '';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json(res, 400, { error: 'Enter a valid email address.' });
-    if (password.length < 8) return json(res, 400, { error: 'Use a password with at least 8 characters.' });
-    if (password.length > 200) return json(res, 400, { error: 'That password is too long.' });
-    const id = db.createUser(email, password);
+    if (!EMAIL_RE.test(email)) return json(res, 400, { error: 'Enter a valid email address.' });
+    const bad = validPassword(body.password);
+    if (bad) return json(res, 400, { error: bad });
+    const id = db.createUser(email, body.password);
     if (!id) return json(res, 409, { error: 'There’s already an account with that email. Log in instead.' });
-    const s = db.createSession(id);
-    return json(res, 201, { ok: true }, { 'set-cookie': sessionCookie(req, s.token, s.maxAge) });
+    return loginWith(req, res, 201, id);
   }
   if (path === '/api/login') {
     const id = db.verifyUser(cleanEmail(body.email), typeof body.password === 'string' ? body.password.slice(0, 200) : '');
     if (!id) return json(res, 401, { error: 'Wrong email or password.' });
-    const s = db.createSession(id);
-    return json(res, 200, { ok: true }, { 'set-cookie': sessionCookie(req, s.token, s.maxAge) });
+    return loginWith(req, res, 200, id);
   }
   if (path === '/api/logout') {
     if (token) db.endSession(token);
     return json(res, 200, { ok: true }, { 'set-cookie': sessionCookie(req, '', 0) });
   }
+  if (path === '/api/forgot') {
+    // Same answer whether or not the account exists, so this can't be used to check who has one
+    const found = db.userByEmail(cleanEmail(body.email));
+    if (found) {
+      const link = `${CONFIG.appUrl}/reset?token=${db.createResetToken(found.id)}`;
+      await sendEmail({
+        to: found.email,
+        subject: 'Reset your Bluebonnet password',
+        text: `Someone (hopefully you) asked to reset the password for your Bluebonnet account.\n\nChoose a new password here (the link works for 1 hour):\n${link}\n\nIf you didn't ask for this, you can ignore this email. Your password won't change.\n\nQuestions? Reply to ${CONFIG.contactEmail}.`,
+      });
+    }
+    return json(res, 200, { ok: true });
+  }
+  if (path === '/api/reset') {
+    const bad = validPassword(body.password);
+    if (bad) return json(res, 400, { error: bad });
+    const id = db.useResetToken(body.token, body.password);
+    if (!id) return json(res, 400, { error: 'This reset link has expired or was already used. Ask for a new one.' });
+    return loginWith(req, res, 200, id);
+  }
 
+  // -- Everything below needs an account
   if (!user) return json(res, 401, { error: 'Log in first.' });
   if (path === '/api/site' && req.method === 'PUT') {
     const { site, error } = cleanSite(body.data);
@@ -166,9 +250,37 @@ async function handle(req, res) {
   }
   if (path === '/api/publish') {
     if (!db.siteForUser(user.id)) return json(res, 400, { error: 'Save your site before publishing.' });
-    return json(res, 200, { site: publicSite(db.setPublished(user.id, body.published !== false)) });
+    const publish = body.published !== false;
+    if (publish && billingEnabled() && !user.paying) return json(res, 402, { needsPayment: true, error: 'Choose a plan to publish your site.' });
+    return json(res, 200, { site: publicSite(db.setPublished(user.id, publish)) });
+  }
+  if (path === '/api/billing/checkout') {
+    if (!billingEnabled()) return json(res, 400, { error: 'Billing isn’t set up yet.' });
+    if (user.paying) return json(res, 400, { error: 'You already have a plan.' });
+    const plan = body.plan === 'yearly' ? 'yearly' : 'monthly';
+    if (!CONFIG.stripe.prices[plan]) return json(res, 500, { error: 'That plan isn’t set up yet.' });
+    const session = await stripe.createCheckout({ user, plan });
+    return json(res, 200, { url: session.url });
+  }
+  if (path === '/api/billing/portal') {
+    if (!billingEnabled() || !user.stripeCustomerId) return json(res, 400, { error: 'No billing to manage yet.' });
+    const portal = await stripe.createPortal({ user });
+    return json(res, 200, { url: portal.url });
   }
   return json(res, 404, { error: 'Not found' });
+}
+
+async function stripeWebhook(req, res) {
+  const raw = await readBody(req);
+  if (!stripe.verifyWebhook(raw, req.headers['stripe-signature'])) return json(res, 400, { error: 'Bad signature' });
+  const event = JSON.parse(raw);
+  const change = stripe.subscriptionChange(event);
+  if (change) {
+    if (change.userId && change.customerId) db.setStripeCustomer(change.userId, change.customerId);
+    db.updateSubscription(change);
+    console.log(`Stripe: ${event.type} → user ${change.userId || `(customer ${change.customerId})`} is ${change.status}`);
+  }
+  return json(res, 200, { received: true });
 }
 
 createServer((req, res) => {
@@ -176,4 +288,7 @@ createServer((req, res) => {
     if (!err.status) console.error(err);
     if (!res.headersSent) json(res, err.status || 500, { error: err.status ? err.message : 'Something went wrong. Try again.' });
   });
-}).listen(PORT, () => console.log(`Bluebonnet builder at http://localhost:${PORT}`));
+}).listen(CONFIG.port, () => {
+  console.log(`Bluebonnet builder at http://localhost:${CONFIG.port}`);
+  console.log(`  billing: ${billingEnabled() ? 'ON (Stripe)' : 'off (publishing is free)'} · sites at: ${siteUrl('<slug>')} · email: ${CONFIG.email.resendKey ? 'Resend' : 'printed here'}`);
+});

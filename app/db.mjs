@@ -2,14 +2,13 @@
 // The file lives at app/data/bluebonnet.db and is git-ignored: it holds customers' emails and password hashes.
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { randomBytes, scryptSync, timingSafeEqual, createHash } from 'node:crypto';
 import { slugify } from '../mockup/render.mjs';
+import { CONFIG, RESERVED_SLUGS } from './config.mjs';
 
-const dataDir = process.env.BLUEBONNET_DATA || join(dirname(fileURLToPath(import.meta.url)), 'data');
-mkdirSync(dataDir, { recursive: true });
-const db = new DatabaseSync(join(dataDir, 'bluebonnet.db'));
+mkdirSync(CONFIG.dataDir, { recursive: true });
+const db = new DatabaseSync(join(CONFIG.dataDir, 'bluebonnet.db'));
 
 db.exec(`
   PRAGMA journal_mode = WAL;
@@ -33,7 +32,21 @@ db.exec(`
     published INTEGER NOT NULL DEFAULT 0,
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+  CREATE TABLE IF NOT EXISTS password_resets (
+    token_hash TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at INTEGER NOT NULL
+  );
 `);
+
+// Billing columns, added to databases made before billing existed. sub_status mirrors Stripe's subscription status.
+const userCols = db.prepare('PRAGMA table_info(users)').all().map((c) => c.name);
+for (const [col, type] of [['stripe_customer_id', 'TEXT'], ['sub_id', 'TEXT'], ['sub_status', 'TEXT'], ['sub_period_end', 'INTEGER']]) {
+  if (!userCols.includes(col)) db.exec(`ALTER TABLE users ADD COLUMN ${col} ${type}`);
+}
+
+// Stripe keeps retrying a failed card for a while (past_due), so the site stays up during that time
+const PAYING = new Set(['active', 'trialing', 'past_due']);
 
 // ---- Passwords: scrypt with a per-user salt, stored as "salt:hash" in hex
 const hashPassword = (pw) => {
@@ -70,27 +83,62 @@ export function createSession(userId) {
   return { token, maxAge: SESSION_DAYS * 86400 };
 }
 
+const toUser = (r) => r && {
+  id: r.id, email: r.email, stripeCustomerId: r.stripe_customer_id || null, subStatus: r.sub_status || null, paying: PAYING.has(r.sub_status),
+};
+
 export function sessionUser(token) {
   if (!token) return null;
-  const row = db.prepare(`SELECT u.id, u.email, s.expires_at FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?`).get(sha(token));
+  const row = db.prepare(`SELECT u.*, s.expires_at FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?`).get(sha(token));
   if (!row) return null;
   if (row.expires_at < Date.now()) { endSession(token); return null; }
-  return { id: row.id, email: row.email };
+  return toUser(row);
 }
 
 export const endSession = (token) => db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(sha(token));
+export const endAllSessions = (userId) => db.prepare('DELETE FROM sessions WHERE user_id = ?').run(userId);
+export const userById = (id) => toUser(db.prepare('SELECT * FROM users WHERE id = ?').get(id));
+export const userByEmail = (email) => toUser(db.prepare('SELECT * FROM users WHERE email = ?').get(email));
+
+// ---- Password resets: one-hour, one-use links. Like sessions, only the token's hash is stored.
+export function createResetToken(userId) {
+  db.prepare('DELETE FROM password_resets WHERE user_id = ? OR expires_at < ?').run(userId, Date.now());
+  const token = randomBytes(32).toString('base64url');
+  db.prepare('INSERT INTO password_resets (token_hash, user_id, expires_at) VALUES (?, ?, ?)').run(sha(token), userId, Date.now() + 3600e3);
+  return token;
+}
+
+export function useResetToken(token, newPassword) {
+  const row = db.prepare('SELECT user_id, expires_at FROM password_resets WHERE token_hash = ?').get(sha(String(token)));
+  if (!row || row.expires_at < Date.now()) return null;
+  db.prepare('DELETE FROM password_resets WHERE user_id = ?').run(row.user_id);
+  db.prepare('UPDATE users SET pass_hash = ? WHERE id = ?').run(hashPassword(newPassword), row.user_id);
+  endAllSessions(row.user_id); // log out everywhere, in case someone else had the old password
+  return row.user_id;
+}
+
+// ---- Billing (written by the Stripe webhook; see stripe.mjs)
+export const setStripeCustomer = (userId, customerId) => db.prepare('UPDATE users SET stripe_customer_id = ? WHERE id = ?').run(customerId, userId);
+
+export function updateSubscription({ userId, customerId, subId, status, periodEnd }) {
+  const where = userId ? ['id = ?', userId] : ['stripe_customer_id = ?', customerId];
+  db.prepare(`UPDATE users SET sub_id = ?, sub_status = ?, sub_period_end = ?${userId && customerId ? ', stripe_customer_id = ?' : ''} WHERE ${where[0]}`)
+    .run(...[subId, status, periodEnd || null, ...(userId && customerId ? [customerId] : []), where[1]]);
+}
 
 // ---- Sites: one per account for now. `data` is the JSON the builder edits (see cleanSite in server.mjs).
-const rowToSite = (r) => r && { slug: r.slug, data: JSON.parse(r.data), published: !!r.published, updatedAt: r.updated_at };
+const rowToSite = (r) => r && { slug: r.slug, data: JSON.parse(r.data), published: !!r.published, updatedAt: r.updated_at, ownerPaying: PAYING.has(r.sub_status) };
 
-export const siteForUser = (userId) => rowToSite(db.prepare('SELECT * FROM sites WHERE user_id = ?').get(userId));
-export const siteBySlug = (slug) => rowToSite(db.prepare('SELECT * FROM sites WHERE slug = ?').get(slug));
+const SITE_SQL = 'SELECT s.*, u.sub_status FROM sites s JOIN users u ON u.id = s.user_id';
+export const siteForUser = (userId) => rowToSite(db.prepare(`${SITE_SQL} WHERE s.user_id = ?`).get(userId));
+export const siteBySlug = (slug) => rowToSite(db.prepare(`${SITE_SQL} WHERE s.slug = ?`).get(slug));
 
 // Picks "juarez-lawn-service", then "juarez-lawn-service-2", ... skipping ones other accounts own
 const freeSlug = (name, userId) => {
   const base = slugify(name).slice(0, 48).replace(/-$/, '') || 'my-business';
   for (let n = 1; ; n++) {
     const slug = n === 1 ? base : `${base}-${n}`;
+    if (RESERVED_SLUGS.has(slug)) continue;
     const owner = db.prepare('SELECT user_id FROM sites WHERE slug = ?').get(slug);
     if (!owner || owner.user_id === userId) return slug;
   }

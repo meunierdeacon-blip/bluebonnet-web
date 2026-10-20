@@ -11,6 +11,8 @@ const iframe = $('.frame iframe');
 const statusEl = $('.status');
 const liveLink = $('.live');
 const dialog = $('dialog.published');
+const plansDialog = $('dialog.plans');
+const billingButton = $('[data-billing]');
 const loggedIn = $('.builder').dataset.loggedIn === 'yes';
 const params = new URLSearchParams(location.search);
 const DRAFT_KEY = 'bluebonnet-draft';
@@ -174,7 +176,7 @@ function save() {
       const { site: saved } = await api('/api/site', { data: site }, 'PUT');
       storage.clear();
       showLive(saved);
-      setStatus(saved.published ? 'Saved · changes are live' : 'Saved', 'good');
+      setStatus(saved.live ? 'Saved · changes are live' : 'Saved', 'good');
       return true;
     } catch (err) {
       setStatus(`Not saved: ${err.message}`, 'warn');
@@ -188,13 +190,13 @@ addEventListener('beforeunload', (e) => {
 });
 
 function showLive(s) {
-  published = !!s?.published;
+  published = !!s?.live;
   liveLink.hidden = !published;
   if (published) liveLink.href = s.url;
 }
 
-// ---------- Publishing
-const absolute = (path) => new URL(path, location.origin).href;
+// ---------- Publishing (and paying first, once billing is on)
+const go = async (path, body) => { location.href = (await api(path, body)).url; };
 async function publish() {
   if (!loggedIn) {
     storage.set(site);
@@ -203,17 +205,33 @@ async function publish() {
   }
   if (!(await save())) return;
   try {
-    const { site: s } = await api('/api/publish', { published: true });
-    showLive(s);
+    const res = await fetch('/api/publish', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{"published":true}' });
+    const data = await res.json();
+    if (data.needsPayment) { plansDialog.showModal(); return; }
+    if (!res.ok) throw new Error(data.error);
+    showLive(data.site);
     setStatus('Published', 'good');
     const a = $('.live-link a', dialog);
-    a.href = s.url;
-    a.textContent = absolute(s.url);
+    a.href = data.site.url;
+    a.textContent = data.site.url;
     dialog.showModal();
   } catch (err) {
     setStatus(err.message, 'warn');
   }
 }
+plansDialog.querySelectorAll('[data-plan]').forEach((b) => b.addEventListener('click', async () => {
+  plansDialog.querySelectorAll('[data-plan]').forEach((x) => { x.disabled = true; });
+  try {
+    await go('/api/billing/checkout', { plan: b.dataset.plan });
+  } catch (err) {
+    const e = $('.error', plansDialog);
+    e.textContent = err.message;
+    e.hidden = false;
+    plansDialog.querySelectorAll('[data-plan]').forEach((x) => { x.disabled = false; });
+  }
+}));
+$('[data-close]', plansDialog).addEventListener('click', () => plansDialog.close());
+billingButton.addEventListener('click', () => go('/api/billing/portal').catch((err) => setStatus(err.message, 'warn')));
 $('[data-publish]').addEventListener('click', publish);
 $('[data-close]', dialog).addEventListener('click', () => dialog.close());
 $('[data-copy]', dialog).addEventListener('click', async (e) => {
@@ -240,10 +258,13 @@ document.querySelectorAll('[data-tab]').forEach((t) => t.addEventListener('click
 // ---------- Start: saved site > draft from before signing up > blank (with ?trade= from the landing page)
 const me = await fetch('/api/me').then((r) => r.json()).catch(() => ({}));
 const draft = storage.get();
+billingButton.hidden = !(me.billing?.enabled && me.user?.hasBilling);
 if (me.site) {
   site = { ...blank(me.site.data.trade), ...me.site.data };
   showLive(me.site);
-  setStatus(me.site.published ? 'Published' : 'Saved', 'good');
+  if (me.site.live) setStatus('Published', 'good');
+  else if (me.site.published) setStatus('Offline: your plan isn’t active. Press Publish to pick one.', 'warn');
+  else setStatus('Saved', 'good');
 } else if (draft) {
   site = { ...blank(draft.trade), ...draft };
   if (!loggedIn) setStatus('Draft saved in this browser');
@@ -257,4 +278,15 @@ if (loggedIn && !me.site && draft) await save();
 if (params.has('publish')) {
   history.replaceState(null, '', '/build');
   if (loggedIn) publish();
+}
+// Back from Stripe Checkout: Stripe tells our server about the payment a moment later, so wait for it, then publish
+if (params.has('paid') && loggedIn) {
+  history.replaceState(null, '', '/build');
+  setStatus('Payment received. Publishing your site…');
+  for (let i = 0; i < 20; i++) {
+    const now = await fetch('/api/me').then((r) => r.json()).catch(() => ({}));
+    if (now.user?.paying) { billingButton.hidden = false; await publish(); break; }
+    if (i === 19) setStatus('Payment is still processing. Refresh in a minute, then press Publish.', 'warn');
+    await new Promise((r) => setTimeout(r, 1500));
+  }
 }

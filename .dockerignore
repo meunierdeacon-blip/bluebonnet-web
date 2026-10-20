@@ -1,0 +1,10 @@
+.git
+app/data
+leads
+mockups
+clients
+dist
+_archive
+PITCHES.md
+*.png
+.DS_Store

@@ -126,11 +126,13 @@ A self-serve version of the mockup tool: an owner picks their trade, fills in a 
 node app/server.mjs        # http://localhost:4330
 ```
 
-- `/` landing page · `/build` the builder (works before signing up; the draft stays in the browser) · `/signup` `/login` · `/s/<slug>/` published sites
+- `/` landing page · `/build` the builder (works before signing up; the draft stays in the browser) · `/signup` `/login` `/forgot` · `/terms` `/privacy` · published sites at `/s/<slug>/` locally, `<slug>.<your domain>` online
 - The preview and the live site use the same template (`mockup/render.mjs`), so what owners see is what gets published.
 - Accounts and sites are saved in `app/data/bluebonnet.db` (built-in SQLite, git-ignored). Passwords are hashed with scrypt; sessions are 30-day HttpOnly cookies.
 - Published sites get a "Website made with Bluebonnet" credit in the footer.
-- **Local only for now.** Still to do before real businesses can use it: payments (Stripe), hosting with a real domain, photo uploads, password reset, and custom domains.
+- Billing (Stripe subscriptions), customer subdomains, password reset emails, and Terms/Privacy pages are built in. Each turns on when its setting is added; with nothing set, publishing is free and emails print in the terminal.
+- **To put it online:** follow [LAUNCH.md](LAUNCH.md) (Fly.io, a domain, Stripe, Resend).
+- Not built yet: photo uploads and customers' own custom domains.
 
 ## Layout
 
@@ -147,6 +149,9 @@ scripts/check.mjs     build checker
 scripts/serve.mjs     local preview server
 scripts/deploy.mjs    publish to GitHub Pages
 app/server.mjs        builder app: routes, validation, published sites
+app/config.mjs        builder app: settings from environment variables, plan prices
+app/stripe.mjs        builder app: Checkout, Billing Portal, webhook check
+app/email.mjs         builder app: password reset emails (Resend)
 app/db.mjs            builder app: accounts, sessions, saved sites (SQLite)
 app/pages.mjs         builder app: landing, sign-up/log-in, builder HTML
 app/public/           builder app: browser code and CSS
