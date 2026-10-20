@@ -11,11 +11,13 @@ const SIGNER = 'Deacon';
 import { INDUSTRIES } from '../src/industries.mjs';
 import { slugify } from '../mockup/render.mjs';
 import { parseCsv } from '../mockup/csv.mjs';
+import { previewLinks } from '../mockup/previews.mjs';
 
 const priorityOf = (r) => Number((r.notes || '').match(/PRIORITY (\d)/)?.[1] || 9);
 const reviewCount = (r) => Number((r.notes || '').match(/stars \/ (\d+)/)?.[1] || 0);
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const live = SITE.url.replace(/^https?:\/\//, '');
+const demoUrl = Object.fromEntries(previewLinks().map((l) => [l.slug, `${SITE.url}${l.path}`]));
 const leads = parseCsv(readFileSync(join(root, 'leads/leads.csv'), 'utf8')).filter((r) => r.status === 'mockup made')
   // Best first: PRIORITY number from notes, then most reviews
   .sort((x, y) => priorityOf(x) - priorityOf(y) || reviewCount(y) - reviewCount(x));
@@ -28,7 +30,7 @@ const reviewsOf = (notes) => {
 
 let out = `# Ready-to-send pitches (updated ${new Date().toISOString().slice(0, 10)})
 
-Each business below was verified the same day it was added: found on Google Maps, phone cross-checked against another listing, and no website found anywhere. Every one has a demo in \`mockups/<folder>/\`.
+Each business below was verified the same day it was added: found on Google Maps, phone cross-checked against another listing, and no website found anywhere. Every one has a demo in \`mockups/<folder>/\` and a private link to it (unlisted, hidden from Google). The links only work after \`node scripts/deploy.mjs\`.
 
 **Sending a screenshot?** Attach \`phone.png\` from their folder. The messages below don't mention a screenshot, so they work either way.
 
@@ -38,7 +40,7 @@ Each business below was verified the same day it was added: found on Google Maps
 
 **After sending:** set \`status\` to \`contacted\` and fill in the \`contacted\` date. Follow up once 3–4 days later, then stop.
 
-**Phone script:** "Hi, is this the owner? I'm ${SIGNER}, I build websites for local businesses around Austin. I noticed you've got great reviews but no website, so I put together a free sample of what one could look like. Can I text or email it to you? No cost, no pressure."
+**Phone script:** "Hi, is this the owner? I'm ${SIGNER}, I build websites for local businesses around Austin. I noticed you've got great reviews but no website, so I already built a free sample site for you. Can I text or email you the link? No cost, no pressure."
 
 ---
 `;
@@ -49,16 +51,19 @@ leads.forEach((r, i) => {
   const opener = rv
     ? `Hi! I came across ${r.name} on Google Maps. ${rv.count} reviews at ${rv.stars} stars is awesome, but I couldn't find a website for you.`
     : `Hi! I came across ${r.name} on Google Maps and noticed you don't have a website yet.`;
-  const proof = `Here's a real one we built: waterlineweeds.co${ind ? `, and more about what we do for ${ind.plural}: ${live}/websites-for/${ind.slug}/` : ''}`;
+  const demo = demoUrl[slugify(r.name)];
+  // With a demo link in the message, one more link is plenty
+  const proof = `Here's a real one we built: waterlineweeds.co${ind && !demo ? `, and more about what we do for ${ind.plural}: ${live}/websites-for/${ind.slug}/` : ''}`;
   out += `
 ## ${i + 1}. ${r.name} (${r.trade}, ${r.town})
 - **Phone:** ${r.phone} · **Reach by:** ${r.contact}
-- **Demo:** \`mockups/${slugify(r.name)}/\` · **Notes:** ${r.notes}
+- **Demo link:** ${demo || 'none yet (add a mockup and rebuild)'}
+- **Notes:** ${r.notes}
 
-> ${opener} I'm ${SIGNER}. My partner and I build simple websites for local businesses so people searching Google can find you and book. I'd be happy to make you a free sample of what yours could look like. ${proof} Happy to chat if you're interested, and no worries if not!
+> ${opener} I'm ${SIGNER}. My partner and I build simple websites for local businesses so people searching Google can find you and book. ${demo ? `I went ahead and made a free sample of what yours could look like: ${demo}` : "I'd be happy to make you a free sample of what yours could look like."} ${proof} Happy to chat if you're interested, and no worries if not!
 
 **Follow-up (3–4 days later, only if no reply):**
-> Hi, just following up on my message about a website for ${r.name}. Want me to put together that free sample, or send over pricing? If not, no worries. I won't message again.
+> Hi, just following up on my message about a website for ${r.name}. ${demo ? `Did you get a chance to look at the sample site? ${demo} Happy to send pricing or make changes.` : 'Want me to put together that free sample, or send over pricing?'} If not, no worries. I won't message again.
 `;
 });
 

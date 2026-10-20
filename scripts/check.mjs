@@ -32,7 +32,7 @@ const resolves = (href, from) => {
 for (const file of htmlFiles) {
   const html = readFileSync(file, 'utf8');
   const rel = relative(DIST, file);
-  const isSample = rel.startsWith('samples/');
+  const isSample = rel.startsWith('samples/') || rel.startsWith('p/');
 
   for (const [, href] of html.matchAll(/\s(?:href|src)="([^"]+)"/g)) {
     if (/^(https?:|mailto:|tel:|data:|#)/.test(href)) continue;

@@ -6,6 +6,7 @@ import { SITE } from './src/site.mjs';
 import { INDUSTRIES } from './src/industries.mjs';
 import { renderPage } from './src/layout.mjs';
 import { renderMockup } from './mockup/render.mjs';
+import { previewLinks } from './mockup/previews.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const out = join(root, 'dist');
@@ -52,6 +53,14 @@ for (const i of INDUSTRIES) {
   )));
 }
 
+// Private demo links for leads (noindex, not linked from anywhere). See mockup/previews.mjs.
+const previews = previewLinks();
+for (const p of previews) {
+  const dest = join(out, p.path, 'index.html');
+  await mkdir(dirname(dest), { recursive: true });
+  await cp(p.src, dest);
+}
+
 const indexable = pages.filter((p) => !p.noindex)
   .sort((a, b) => (b.priority || '0.5') - (a.priority || '0.5') || a.path.localeCompare(b.path));
 await writeFile(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
@@ -66,6 +75,7 @@ ${indexable.map((p) => `  <url>
 await writeFile(join(out, 'robots.txt'), `User-agent: *
 Allow: /
 Disallow: ${BASE}/samples/
+Disallow: ${BASE}/p/
 
 Sitemap: ${SITE.url}/sitemap.xml
 `);
@@ -81,4 +91,4 @@ await writeFile(join(out, 'llms.txt'), `# ${SITE.name}
 ${indexable.map((p) => `- [${p.title.split(' | ')[0]}](${SITE.url}${p.path}): ${p.description}`).join('\n')}
 `);
 
-console.log(`Built ${pages.length} pages + ${INDUSTRIES.length} samples → dist/ (${indexable.length} in sitemap)`);
+console.log(`Built ${pages.length} pages + ${INDUSTRIES.length} samples + ${previews.length} private demos → dist/ (${indexable.length} in sitemap)`);
