@@ -9,12 +9,18 @@ Do the steps in order. Each one says what to tell Claude when you're done, so it
 
 ---
 
-## Step 1. Railway (hosting): you
+## Step 1. Railway (hosting): ✅ done October 20, 2026
+
+Live at **https://bluebonnet-production.up.railway.app**: project `bluebonnet`, service `bluebonnet`, volume `bluebonnet-volume` at `/data`, and `APP_URL` set. Until Stripe is set up (Step 3), billing is off and anyone with the link can publish for free.
+
+<details><summary>What was done</summary>
 
 1. Sign up at **railway.com**. "Sign in with GitHub" is easiest; use the `meunierdeacon-blip` account.
 2. Choose the **Hobby** plan ($5/month) and add a card. The free trial can't hold a domain plus customer subdomains.
 
-**Then tell Claude:** "Railway is set up." Claude will install Railway's command-line tool (the `@railway/cli` npm package) and start the login. A browser page asks you to approve it. Then Claude creates the project and its storage (a 5 GB volume at `/data`), deploys, and gives you a working `….up.railway.app` link.
+**Then tell Claude:** "Railway is set up." Claude will install Railway's command-line tool (the `@railway/cli` npm package) and start the login. A browser page asks you to approve it. Then Claude creates the project and its storage (a volume at `/data`), deploys, and gives you a working `….up.railway.app` link.
+
+</details>
 
 ## Step 2. Domain: you
 
@@ -98,4 +104,8 @@ The displayed prices ($15 / $150) are in `app/config.mjs` (`PLAN_LABELS`). Chang
 ~/.npm-global/bin/railway open          # open the project dashboard
 ```
 
-Run only **one** replica. All accounts and sites are in one SQLite file on one volume.
+Run only **one** replica. All accounts and sites are in one SQLite file on one volume. Restarts and deploys take the app offline for a few seconds.
+
+**To do by December 1, 2026:** Railway is retiring `railway.json` in favor of `.railway/railway.ts` (`railway config migrate --variables=unmanaged`). The generated file doesn't declare the volume yet, so check Railway's docs that the migration won't touch `bluebonnet-volume` before switching. Download a backup first.
+
+**Volume size:** the dashboard showed 500 MB at creation, which is the trial size. Hobby allows up to 5 GB; grow it in the service's volume settings if it ever gets close. The database is tiny: each site is a few KB.

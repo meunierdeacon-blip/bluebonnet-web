@@ -154,7 +154,7 @@ async function handle(req, res) {
   if (sub === 'www') return send(res, 301, '', { location: `https://${CONFIG.baseDomain}${req.url}` });
   if (sub) {
     const site = /^[a-z0-9-]+$/.test(sub) && db.siteBySlug(sub);
-    if (req.method !== 'GET' || path !== '/' || !isLive(site)) return html(res, 404, notFoundPage());
+    if (!['GET', 'HEAD'].includes(req.method) || path !== '/' || !isLive(site)) return html(res, 404, notFoundPage());
     return siteHtml(res, site);
   }
 
@@ -163,7 +163,8 @@ async function handle(req, res) {
   const token = cookies(req).bb_session;
   const user = db.sessionUser(token);
 
-  if (req.method === 'GET') {
+  // HEAD is GET without the body (Node drops the body itself); uptime checkers and link previews use it
+  if (req.method === 'GET' || req.method === 'HEAD') {
     if (STATIC[path]) {
       const [file, type] = STATIC[path];
       return send(res, 200, await readFile(file), { 'content-type': type, 'cache-control': 'no-cache' });
@@ -254,6 +255,12 @@ async function handle(req, res) {
     const publish = body.published !== false;
     if (publish && billingEnabled() && !user.paying) return json(res, 402, { needsPayment: true, error: 'Choose a plan to publish your site.' });
     return json(res, 200, { site: publicSite(db.setPublished(user.id, publish)) });
+  }
+  if (path === '/api/account/delete') {
+    if (!db.verifyUser(user.email, typeof body.password === 'string' ? body.password.slice(0, 200) : '')) return json(res, 401, { error: 'That password isn’t right.' });
+    if (billingEnabled() && user.paying) return json(res, 400, { error: 'Cancel your plan from the Billing link first, so you aren’t charged again.' });
+    db.deleteUser(user.id);
+    return json(res, 200, { ok: true }, { 'set-cookie': sessionCookie(req, '', 0) });
   }
   if (path === '/api/billing/checkout') {
     if (!billingEnabled()) return json(res, 400, { error: 'Billing isn’t set up yet.' });

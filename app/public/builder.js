@@ -244,6 +244,25 @@ $('[data-unpublish]', dialog).addEventListener('click', async () => {
   dialog.close();
 });
 
+// ---------- Deleting the account
+const deleteDialog = $('dialog.delete-account');
+$('[data-delete-account]')?.addEventListener('click', () => deleteDialog.showModal());
+$('[data-close]', deleteDialog).addEventListener('click', () => deleteDialog.close());
+$('[data-confirm-delete]', deleteDialog).addEventListener('click', async (e) => {
+  const err = $('.error', deleteDialog);
+  err.hidden = true;
+  e.target.disabled = true;
+  try {
+    await api('/api/account/delete', { password: deleteDialog.querySelector('[name=password]').value });
+    storage.clear();
+    location.href = '/';
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.hidden = false;
+    e.target.disabled = false;
+  }
+});
+
 // ---------- Phone/desktop toggle, and Edit/Preview tabs on small screens
 document.querySelectorAll('[data-device]').forEach((b) => b.addEventListener('click', () => {
   if (b.tagName !== 'BUTTON') return;

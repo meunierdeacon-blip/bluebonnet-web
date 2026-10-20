@@ -119,6 +119,7 @@ export const builderPage = ({ user }) => shell({
   </div>
   <a class="link live" target="_blank" rel="noopener" hidden>View live site ↗</a>
   <button class="link" type="button" data-billing hidden>Billing</button>
+  ${user ? '<button class="link" type="button" data-delete-account>Delete account</button>' : ''}
   <nav>${accountLinks(user)}</nav>
   <button class="btn sm" type="button" data-publish>${user ? 'Publish' : 'Save &amp; publish'}</button>
 </header>
@@ -174,6 +175,18 @@ export const builderPage = ({ user }) => shell({
   <p class="muted small">Payments are handled securely by Stripe. We never see your card number.</p>
   <div class="actions"><button class="btn ghost" type="button" data-close>Not yet</button></div>
 </dialog>
+<dialog class="delete-account">
+  <h2>Delete your account?</h2>
+  <p class="muted">This permanently deletes your account and your website. It can’t be undone.</p>
+  <form method="dialog" class="stack">
+    <label>Type your password to confirm<input name="password" type="password" autocomplete="current-password" required></label>
+    <p class="error" role="alert" hidden></p>
+    <div class="actions">
+      <button class="btn danger" type="button" data-confirm-delete>Delete everything</button>
+      <button class="btn ghost" type="button" data-close>Keep my account</button>
+    </div>
+  </form>
+</dialog>
 <dialog class="published">
   <h2>Your site is live 🎉</h2>
   <p class="muted">Share this link on your Google listing, Facebook page, and business cards.</p>
@@ -198,7 +211,7 @@ const LEGAL = {
   <h2>Availability</h2>
   <p>We work to keep sites online, but we can’t promise they’ll never go down. Bluebonnet is provided “as is”. To the extent the law allows, we aren’t liable for lost business or other indirect losses, and our total liability is limited to what you paid us in the last 12 months.</p>
   <h2>Ending your account</h2>
-  <p>You can stop using Bluebonnet anytime. Email ${esc(CONFIG.contactEmail)} to have your account and site deleted. We can suspend or close accounts that break these terms.</p>
+  <p>You can stop using Bluebonnet anytime, and delete your account and site with the <b>Delete account</b> link in the builder (cancel your plan first). We can suspend or close accounts that break these terms.</p>
   <h2>Changes and contact</h2>
   <p>We may update these terms and will post the new version here. These terms are governed by the laws of Texas. Questions: <a href="mailto:${esc(CONFIG.contactEmail)}">${esc(CONFIG.contactEmail)}</a>.</p>` },
   privacy: { title: 'Privacy Policy', body: () => `
@@ -214,7 +227,7 @@ const LEGAL = {
   <h2>Who we share it with</h2>
   <p>Only the services that run Bluebonnet: our hosting provider, Stripe for payments, and our email provider for password reset emails. We don’t sell your information or share it for advertising.</p>
   <h2>Your choices</h2>
-  <p>You can edit your site anytime in the builder. To delete your account and site, or to ask what we have about you, email <a href="mailto:${esc(CONFIG.contactEmail)}">${esc(CONFIG.contactEmail)}</a>.</p>
+  <p>You can edit your site anytime in the builder, and delete your account and site yourself with the <b>Delete account</b> link in the builder. To ask what we have about you, email <a href="mailto:${esc(CONFIG.contactEmail)}">${esc(CONFIG.contactEmail)}</a>.</p>
   <h2>Changes</h2>
   <p>If we change this policy, we’ll post the new version here.</p>` },
 };

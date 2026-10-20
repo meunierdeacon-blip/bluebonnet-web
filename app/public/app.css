@@ -17,6 +17,8 @@ a{color:var(--accent)}
 .btn:hover{filter:brightness(1.08)}
 .btn:disabled{opacity:.6;cursor:wait}
 .btn.sm{padding:8px 14px;font-size:.92rem}
+.btn.danger{background:#c0392b;color:#fff}
+.stack{display:grid;gap:14px}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
 .link{background:none;border:0;padding:0;font:inherit;color:var(--muted);cursor:pointer;text-decoration:none;white-space:nowrap}
 .link:hover{color:var(--ink)}

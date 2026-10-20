@@ -95,6 +95,7 @@ export function sessionUser(token) {
   return toUser(row);
 }
 
+export const deleteUser = (userId) => db.prepare('DELETE FROM users WHERE id = ?').run(userId); // sites, sessions, resets cascade
 export const endSession = (token) => db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(sha(token));
 export const endAllSessions = (userId) => db.prepare('DELETE FROM sessions WHERE user_id = ?').run(userId);
 export const userById = (id) => toUser(db.prepare('SELECT * FROM users WHERE id = ?').get(id));
