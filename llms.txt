@@ -1,0 +1,25 @@
+# Bluebonnet Web
+
+> Bluebonnet Web builds fast, phone-friendly, Google-ready websites for small local service businesses in the Austin, Texas area, at flat prices with an optional monthly care plan.
+
+- Based in: Austin, Texas
+- Serves: Austin, Lakeway, Bee Cave, Round Rock, Cedar Park, Georgetown, Pflugerville, Dripping Springs, Marble Falls
+
+## Pages
+- [Websites for Austin Small Businesses](https://meunierdeacon-blip.github.io/bluebonnet-web/): Fast, phone-friendly, Google-ready websites for Austin-area local service businesses. Flat pricing, live in about a week, optional monthly care.
+- [Get a Free Website Quote](https://meunierdeacon-blip.github.io/bluebonnet-web/contact/): Tell us about your business and get a flat-price quote for a new website. Serving small businesses in Austin, Lakeway, Round Rock, Cedar Park, and nearby.
+- [Website Pricing for Small Businesses](https://meunierdeacon-blip.github.io/bluebonnet-web/pricing/): Flat website pricing for Austin small businesses: Starter $400, Local SEO Site, and an optional monthly Care Plan. No hourly billing.
+- [Free Small Business Website Check](https://meunierdeacon-blip.github.io/bluebonnet-web/website-check/): Eight quick questions to see if your small business website is losing customers. Takes 60 seconds, works on your phone, no email required.
+- [Websites for Local Service Businesses](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/): Websites built for how customers find lawn care, cleaning, pool, detailing, food truck, tutoring, lake service, and handyman businesses around Austin.
+- [Our Work: Small Business Websites](https://meunierdeacon-blip.github.io/bluebonnet-web/work/): See websites we’ve built for local businesses, including Waterline Weed Co.: a multi-page, search-ready site for a lake weed removal company.
+- [Websites for Food Trucks in Austin](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/food-trucks/): Phone-friendly, Google-ready websites for food trucks in the Austin area. Flat pricing from $400, live in about a week. See a sample site.
+- [Websites for Handymen in Austin](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/handyman/): Phone-friendly, Google-ready websites for handymen in the Austin area. Flat pricing from $400, live in about a week. See a sample site.
+- [Websites for House Cleaners in Austin](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/house-cleaning/): Phone-friendly, Google-ready websites for house cleaners in the Austin area. Flat pricing from $400, live in about a week. See a sample site.
+- [Websites for Lake and Dock Businesses in Austin](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/lake-services/): Phone-friendly, Google-ready websites for lake and dock businesses in the Austin area. Flat pricing from $400, live in about a week. See a sample site.
+- [Websites for Landscapers in Austin](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/landscaping/): Phone-friendly, Google-ready websites for landscapers in the Austin area. Flat pricing from $400, live in about a week. See a sample site.
+- [Websites for Lawn Care Companies in Austin](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/lawn-care/): Phone-friendly, Google-ready websites for lawn care companies in the Austin area. Flat pricing from $400, live in about a week. See a sample site.
+- [Websites for Mobile Detailers in Austin](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/mobile-detailing/): Phone-friendly, Google-ready websites for mobile detailers in the Austin area. Flat pricing from $400, live in about a week. See a sample site.
+- [Websites for Pool Service Companies in Austin](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/pool-service/): Phone-friendly, Google-ready websites for pool service companies in the Austin area. Flat pricing from $400, live in about a week. See a sample site.
+- [Websites for Pressure Washing Companies in Austin](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/pressure-washing/): Phone-friendly, Google-ready websites for pressure washing companies in the Austin area. Flat pricing from $400, live in about a week. See a sample site.
+- [Websites for Tutors in Austin](https://meunierdeacon-blip.github.io/bluebonnet-web/websites-for/tutors/): Phone-friendly, Google-ready websites for tutors in the Austin area. Flat pricing from $400, live in about a week. See a sample site.
+- [Privacy](https://meunierdeacon-blip.github.io/bluebonnet-web/privacy/): How Bluebonnet Web handles your information: no tracking cookies, no analytics, and quote requests go straight from your email app to ours.

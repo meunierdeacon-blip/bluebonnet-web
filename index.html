@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en" data-base="/bluebonnet-web">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Websites for Austin Small Businesses | Bluebonnet Web</title>
+<meta name="description" content="Fast, phone-friendly, Google-ready websites for Austin-area local service businesses. Flat pricing, live in about a week, optional monthly care.">
+<link rel="canonical" href="https://meunierdeacon-blip.github.io/bluebonnet-web/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bluebonnet Web">
+<meta property="og:title" content="Websites for Austin Small Businesses | Bluebonnet Web">
+<meta property="og:description" content="Fast, phone-friendly, Google-ready websites for Austin-area local service businesses. Flat pricing, live in about a week, optional monthly care.">
+<meta property="og:url" content="https://meunierdeacon-blip.github.io/bluebonnet-web/">
+<meta name="theme-color" content="#faf7f0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="/bluebonnet-web/favicon.svg" type="image/svg+xml">
+<style>:root{--bg:#faf7f0;--surface:#fff;--ink:#1b2a24;--muted:#5a6660;--line:#e4ded0;--accent:#3b5bdb;--accent-ink:#fff;--accent-soft:#e8edff;--good:#2f7d4f;--warn:#b4581b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121815;--surface:#1a221e;--ink:#eef1ec;--muted:#a3ada7;--line:#2c3631;--accent:#8ea6ff;--accent-ink:#0f1633;--accent-soft:#232c4a;--good:#6fcf97;--warn:#f2a46b}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.15;margin:0 0 .5em;letter-spacing:-.01em}
+h1{font-size:clamp(2.2rem,6vw,3.6rem)}
+h2{font-size:clamp(1.7rem,4vw,2.4rem)}
+h3{font-size:1.25rem}
+p{margin:0 0 1em}
+a{color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+section{padding:72px 0;border-top:1px solid var(--line)}
+section.tight{padding:48px 0}
+.eyebrow{font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
+.lede{font-size:1.15rem;color:var(--muted);max-width:40em}
+.skip{position:absolute;left:-9999px}.skip:focus{left:16px;top:8px;z-index:20;background:var(--surface);padding:8px}
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:1.2rem;color:var(--ink);text-decoration:none;white-space:nowrap}
+header nav a{color:var(--muted);text-decoration:none;margin-left:20px;font-size:.95rem}
+header nav a:hover,header nav a[aria-current]{color:var(--ink)}
+@media (max-width:760px){header nav a:not(.btn){display:none}}
+.btn{display:inline-block;background:var(--accent);color:var(--accent-ink);padding:12px 20px;border-radius:10px;font-weight:600;text-decoration:none;border:0;font-size:1rem;cursor:pointer;font-family:inherit}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+header nav .btn{padding:8px 14px;font-size:.9rem;margin-left:20px;color:var(--accent-ink)}
+.hero{padding:88px 0 72px;border-top:0}
+.hero.sub{padding:64px 0 48px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.proof{margin-top:40px;display:flex;gap:28px;flex-wrap:wrap;color:var(--muted);font-size:.95rem}
+.proof b{color:var(--ink);font-weight:600}
+.crumbs{font-size:.9rem;color:var(--muted);margin-bottom:16px}
+.crumbs a{color:var(--muted)}
+.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:32px}
+.grid.small{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px}
+.card p{color:var(--muted);margin:0}
+a.card{text-decoration:none;color:var(--ink);transition:border-color .15s}
+a.card:hover{border-color:var(--accent)}
+a.card.mini{padding:14px 18px;font-weight:600}
+.price{display:flex;flex-direction:column}
+.price .amt{font-family:Fraunces,Georgia,serif;font-size:2.4rem;font-weight:700;margin:4px 0 2px}
+.price .amt small{font-size:1rem;font-family:Inter,sans-serif;color:var(--muted);font-weight:400}
+.price ul{padding-left:1.1em;color:var(--muted);margin:16px 0 24px;flex:1}
+.price li{margin-bottom:6px}
+.price.featured{border:2px solid var(--accent)}
+.tag{display:inline-block;align-self:flex-start;background:var(--accent-soft);color:var(--accent);font-size:.75rem;font-weight:600;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+.split{display:grid;gap:32px;grid-template-columns:1.1fr 1fr;align-items:center}
+@media (max-width:800px){.split{grid-template-columns:1fr}}
+.browser{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 20px 40px -24px rgba(0,0,0,.25)}
+.browser .bar{display:flex;gap:6px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);font-size:.8rem;color:var(--muted)}
+.browser .dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.browser .url{margin-left:10px;background:var(--bg);padding:3px 10px;border-radius:6px;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.browser iframe{display:block;width:100%;height:420px;border:0;background:#fff}
+.browser .body{padding:28px;background:linear-gradient(160deg,#0f3b4a,#16606e);color:#f2fbfa;min-height:220px}
+.browser .body h3{color:#fff;font-size:1.5rem}
+.browser .body p{color:#cfe8e6;font-size:.95rem}
+.fake-btn{display:inline-block;background:#f4c542;color:#1b2a24;padding:8px 14px;border-radius:8px;font-weight:600;font-size:.9rem}
+.checks{list-style:none;padding:0;margin:20px 0}
+.checks li{padding-left:28px;position:relative;margin-bottom:10px}
+.checks li::before{content:"✓";position:absolute;left:0;color:var(--good);font-weight:700}
+.quiz{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px;margin-top:32px}
+.q{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer;font-weight:400}
+.q:last-of-type{border-bottom:0}
+.q input{width:20px;height:20px;margin-top:3px;accent-color:var(--accent);flex-shrink:0}
+.q small{display:block;color:var(--muted);font-size:.88rem}
+.meter{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:20px 0 10px}
+.meter i{display:block;height:100%;width:0;background:var(--warn);transition:width .3s,background .3s}
+.verdict{font-weight:600;min-height:1.6em}
+.steps{counter-reset:s}
+.steps .card{position:relative;padding-top:56px}
+.steps .card::before{counter-increment:s;content:counter(s);position:absolute;top:20px;left:24px;width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:700;display:grid;place-items:center;font-size:.9rem}
+details{border-bottom:1px solid var(--line);padding:16px 0}
+summary{font-weight:600;cursor:pointer}
+details p{color:var(--muted);margin:10px 0 0}
+.prose{max-width:42em}
+.prose h2{font-size:1.5rem;margin-top:1.6em}
+form.quote{display:grid;gap:14px;margin-top:28px;max-width:620px}
+label{font-weight:500;font-size:.95rem;display:grid;gap:6px}
+input[type=text],input[type=email],select,textarea{font:inherit;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+textarea{min-height:110px;resize:vertical}
+.row{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+.form-note{color:var(--muted);font-size:.9rem}
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:.9rem}
+footer .cols{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+footer h4{color:var(--ink);margin:0 0 8px;font-size:.95rem}
+footer ul{list-style:none;padding:0;margin:0}
+footer li{margin-bottom:4px}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--ink)}</style>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"ProfessionalService","@id":"https://meunierdeacon-blip.github.io/bluebonnet-web/#business","name":"Bluebonnet Web","url":"https://meunierdeacon-blip.github.io/bluebonnet-web/","description":"Bluebonnet Web builds fast, phone-friendly, Google-ready websites for small local service businesses in the Austin, Texas area, at flat prices with an optional monthly care plan.","areaServed":[{"@type":"City","name":"Austin, TX"},{"@type":"City","name":"Lakeway, TX"},{"@type":"City","name":"Bee Cave, TX"},{"@type":"City","name":"Round Rock, TX"},{"@type":"City","name":"Cedar Park, TX"},{"@type":"City","name":"Georgetown, TX"},{"@type":"City","name":"Pflugerville, TX"},{"@type":"City","name":"Dripping Springs, TX"},{"@type":"City","name":"Marble Falls, TX"}],"email":"meunierdeacon@gmail.com","makesOffer":[{"@type":"Offer","name":"Starter","price":400,"priceCurrency":"USD"},{"@type":"Offer","name":"Local SEO Site","price":900,"priceCurrency":"USD"},{"@type":"Offer","name":"Care Plan","price":35,"priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":35,"priceCurrency":"USD","unitText":"MONTH"}}]},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do payments work?","acceptedAnswer":{"@type":"Answer","text":"Half up front to start, half when the site is live and you’re happy with it. Care Plans are billed monthly and you can cancel anytime."}},{"@type":"Question","name":"Do I need to already have a domain name?","acceptedAnswer":{"@type":"Answer","text":"No. We’ll help you pick and register one. It usually costs around $10–20 a year, paid directly by you so you always own it."}},{"@type":"Question","name":"What if I don’t have photos or a logo?","acceptedAnswer":{"@type":"Answer","text":"That’s fine. We can start with a clean text logo, and phone photos of your work are usually better than stock photos anyway."}},{"@type":"Question","name":"Do I own the website?","acceptedAnswer":{"@type":"Answer","text":"Yes. The domain is in your name, and if you ever leave we hand over all the files."}},{"@type":"Question","name":"Can you guarantee I’ll be #1 on Google?","acceptedAnswer":{"@type":"Answer","text":"Nobody honestly can. What we can do is set your site up the right way so Google understands what you do and where, which is what most local businesses are missing."}}]}]</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+  <div class="wrap">
+    <a class="logo" href="/bluebonnet-web/">🌼 Bluebonnet Web</a>
+    <nav aria-label="Main">
+      <a href="/bluebonnet-web/work/">Work</a>
+      <a href="/bluebonnet-web/websites-for/">Industries</a>
+      <a href="/bluebonnet-web/pricing/">Pricing</a>
+      <a href="/bluebonnet-web/website-check/">Free check</a>
+      <a class="btn" href="/bluebonnet-web/contact/">Get a quote</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Websites for Austin-area small businesses</div>
+    <h1>Your customers are searching Google.<br>Let’s make sure they find you.</h1>
+    <p class="lede">We build fast, good-looking websites for local service businesses: landscapers, cleaners, lake and pool services, tutors, food trucks. You get a site that works on phones and is set up for Google, usually live within about a week, at a flat price.</p>
+    <div class="actions">
+      <a class="btn" href="/bluebonnet-web/contact/">Get a free quote</a>
+      <a class="btn ghost" href="/bluebonnet-web/website-check/">Check your current site</a>
+    </div>
+    <div class="proof">
+      <span><b>Flat pricing</b>, no surprise bills</span>
+      <span><b>Phone-first</b> design</span>
+      <span><b>Google-ready</b> from day one</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap split">
+    <div>
+      <div class="eyebrow">Recent work</div>
+      <h2>Waterline Weed Co.</h2>
+      <p class="lede">A lake-weed removal crew needed people on Lake Travis and Lake Austin to find them. We built the whole site from scratch.</p>
+      <ul class="checks"><li>A multi-page site with a page for each lake and service, so each one can show up in search</li><li>Custom domain, HTTPS, and verified in Google Search Console with a submitted sitemap</li><li>Search-friendly titles, descriptions, and structured data on every page</li><li>Built to load fast on a phone at the dock, not just on a laptop</li></ul>
+      <div class="actions" style="margin-top:0">
+        <a class="btn ghost" href="/bluebonnet-web/work/">About this project</a>
+        <a class="btn ghost" href="https://waterlineweeds.co" target="_blank" rel="noopener">See the live site ↗</a>
+      </div>
+    </div>
+    <div class="browser" aria-hidden="true">
+      <div class="bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="url">waterlineweeds.co</span></div>
+      <div class="body">
+        <h3>Clear water. Clean docks.</h3>
+        <p>Hand-pulled, chemical-free hydrilla removal on Lake Travis, Lake Austin, and Lake LBJ.</p>
+        <span class="fake-btn">Get a quote</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Who we build for</div>
+    <h2>Built for the way your customers search</h2>
+    <p class="lede">Every trade gets found a little differently. Pick yours to see what we’d build and a sample site.</p>
+    <div class="grid small">
+      <a class="card mini" href="/bluebonnet-web/websites-for/lawn-care/">Lawn Care →</a>
+      <a class="card mini" href="/bluebonnet-web/websites-for/landscaping/">Landscaping →</a>
+      <a class="card mini" href="/bluebonnet-web/websites-for/house-cleaning/">House Cleaning →</a>
+      <a class="card mini" href="/bluebonnet-web/websites-for/pool-service/">Pool Service →</a>
+      <a class="card mini" href="/bluebonnet-web/websites-for/mobile-detailing/">Mobile Detailing →</a>
+      <a class="card mini" href="/bluebonnet-web/websites-for/pressure-washing/">Pressure Washing →</a>
+      <a class="card mini" href="/bluebonnet-web/websites-for/food-trucks/">Food Trucks →</a>
+      <a class="card mini" href="/bluebonnet-web/websites-for/tutors/">Tutors →</a>
+      <a class="card mini" href="/bluebonnet-web/websites-for/lake-services/">Lake &amp; Dock Services →</a>
+      <a class="card mini" href="/bluebonnet-web/websites-for/handyman/">Handyman →</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Pricing</div>
+    <h2>Simple, flat prices</h2>
+    <p class="lede">No hourly billing. You’ll know the full price before we start, and you pay the rest only when you’re happy with the site.</p>
+    <div class="grid">
+  <div class="card price">
+    
+    <h3>Starter</h3>
+    <div class="amt">$400</div>
+    <p>For businesses with no website, or one that’s embarrassing.</p>
+    <ul><li>One polished page: services, area, photos, contact</li><li>Works great on phones</li><li>Contact form or tap-to-call button</li><li>Basic Google setup</li></ul>
+    <a class="btn ghost" href="/bluebonnet-web/contact/?plan=starter">Choose Starter</a>
+  </div>
+  <div class="card price featured">
+    <span class="tag">Most popular</span>
+    <h3>Local SEO Site</h3>
+    <div class="amt">$900</div>
+    <p>For businesses that want to show up when people search.</p>
+    <ul><li>Up to 6 pages (a page per service or area)</li><li>Quote form with photo upload</li><li>Search titles, descriptions, and sitemap</li><li>Google Search Console setup</li><li>Custom domain connected</li></ul>
+    <a class="btn" href="/bluebonnet-web/contact/?plan=local-seo">Choose Local SEO Site</a>
+  </div>
+  <div class="card price">
+    
+    <h3>Care Plan</h3>
+    <div class="amt">$35<small> /month</small></div>
+    <p>Add to any site so you never have to think about it.</p>
+    <ul><li>Hosting handled for you</li><li>Text or photo changes, done within 2 business days</li><li>New prices or hours anytime</li><li>Cancel whenever</li></ul>
+    <a class="btn ghost" href="/bluebonnet-web/contact/?plan=care">Choose Care Plan</a>
+  </div>
+</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap split">
+    <div>
+      <div class="eyebrow">Free 60-second check</div>
+      <h2>Is your website costing you customers?</h2>
+      <p class="lede">Eight quick yes-or-no questions. Pull up your site on your phone and see how it scores. No email needed.</p>
+      <a class="btn" href="/bluebonnet-web/website-check/">Take the free check</a>
+    </div>
+    <div class="card">
+      <ul class="checks" style="margin:0">
+        <li>Works on phones without zooming</li>
+        <li>One tap to call or request a quote</li>
+        <li>Loads fast on cell data</li>
+        <li>Says what you do and where</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">How it works</div>
+    <h2>Live in about a week</h2>
+    <div class="grid steps">
+      <div class="card"><h3>Quick call</h3><p>15 minutes. You tell us what you do, where you work, and what customers ask about most.</p></div>
+      <div class="card"><h3>We build it</h3><p>You send photos and your logo if you have one. We write the first draft of the words for you.</p></div>
+      <div class="card"><h3>You review</h3><p>We send you a private link. Ask for changes until it feels right.</p></div>
+      <div class="card"><h3>Go live</h3><p>We connect your domain and set up Google. You pay the balance once it’s live.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Questions</div>
+    <h2>Common questions</h2>
+    <details><summary>How do payments work?</summary><p>Half up front to start, half when the site is live and you’re happy with it. Care Plans are billed monthly and you can cancel anytime.</p></details>
+<details><summary>Do I need to already have a domain name?</summary><p>No. We’ll help you pick and register one. It usually costs around $10–20 a year, paid directly by you so you always own it.</p></details>
+<details><summary>What if I don’t have photos or a logo?</summary><p>That’s fine. We can start with a clean text logo, and phone photos of your work are usually better than stock photos anyway.</p></details>
+<details><summary>Do I own the website?</summary><p>Yes. The domain is in your name, and if you ever leave we hand over all the files.</p></details>
+<details><summary>Can you guarantee I’ll be #1 on Google?</summary><p>Nobody honestly can. What we can do is set your site up the right way so Google understands what you do and where, which is what most local businesses are missing.</p></details>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="eyebrow">Get a quote</div>
+    <h2>Tell us about your business</h2>
+    <p class="lede">We’ll reply within a day with a flat price and a couple of ideas for your site.</p>
+    <form class="quote" data-email="meunierdeacon@gmail.com">
+  <div class="row">
+    <label>Your name<input type="text" name="name" required autocomplete="name"></label>
+    <label>Business name<input type="text" name="business" required autocomplete="organization"></label>
+  </div>
+  <div class="row">
+    <label>Email<input type="email" name="email" required autocomplete="email"></label>
+    <label>Current website (if any)<input type="text" name="website" placeholder="none yet"></label>
+  </div>
+  <label>What are you interested in?
+    <select name="plan">
+      <option value="">Not sure yet</option>
+      <option value="starter">Starter</option><option value="local-seo">Local SEO Site</option><option value="care">Care Plan</option>
+    </select>
+  </label>
+  <label>What does your business do, and where?<textarea name="details" required></textarea></label>
+  <div><button class="btn" type="submit">Send</button></div>
+  <p class="form-note" aria-live="polite"></p>
+</form>
+  </div>
+</section>
+</main>
+<footer>
+  <div class="wrap cols">
+    <div>
+      <h4>🌼 Bluebonnet Web</h4>
+      <p>Websites for small local businesses in and around Austin, Texas.</p>
+    </div>
+    <div>
+      <h4>Industries</h4>
+      <ul><li><a href="/bluebonnet-web/websites-for/lawn-care/">Lawn Care</a></li><li><a href="/bluebonnet-web/websites-for/landscaping/">Landscaping</a></li><li><a href="/bluebonnet-web/websites-for/house-cleaning/">House Cleaning</a></li><li><a href="/bluebonnet-web/websites-for/pool-service/">Pool Service</a></li><li><a href="/bluebonnet-web/websites-for/mobile-detailing/">Mobile Detailing</a></li><li><a href="/bluebonnet-web/websites-for/pressure-washing/">Pressure Washing</a></li><li><a href="/bluebonnet-web/websites-for/">All industries</a></li></ul>
+    </div>
+    <div>
+      <h4>Company</h4>
+      <ul><li><a href="/bluebonnet-web/work/">Our work</a></li><li><a href="/bluebonnet-web/pricing/">Pricing</a></li><li><a href="/bluebonnet-web/website-check/">Free website check</a></li><li><a href="/bluebonnet-web/contact/">Contact</a></li><li><a href="/bluebonnet-web/privacy/">Privacy</a></li></ul>
+    </div>
+  </div>
+  <div class="wrap" style="margin-top:24px">© <span data-year>2026</span> Bluebonnet Web · Austin, Texas</div>
+</footer>
+<script src="/bluebonnet-web/main.js" defer></script>
+</body>
+</html>
